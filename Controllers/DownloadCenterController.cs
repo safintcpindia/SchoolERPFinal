@@ -74,7 +74,7 @@ namespace SchoolERP.Net.Controllers
         [HttpPost]
         public IActionResult ToggleStatus(int id)
         {
-            var res = _service.ToggleContentTypeStatus(id, GetUserId());
+            var res = _service.ToggleContentTypeStatus(id, GetUserId(),GetCompanyId());
             return Json(new { success = res.Success, message = res.Message });
         }
         #endregion
@@ -122,7 +122,7 @@ namespace SchoolERP.Net.Controllers
         [HttpPost]
         public IActionResult ToggleVideoStatus(int id)
         {
-            var res = _service.ToggleVideoTutorialStatus(id, GetUserId());
+            var res = _service.ToggleVideoTutorialStatus(id, GetUserId(),GetCompanyId());
             return Json(new { success = res.Success, message = res.Message });
         }
         #endregion

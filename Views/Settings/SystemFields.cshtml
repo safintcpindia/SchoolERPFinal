@@ -18,27 +18,34 @@
     <div>
         <h6 class="fw-bold mb-0">System Fields</h6>        
     </div>
-    <div class="ms-auto">
+    <!--<div class="ms-auto">
         <input type="text" id="txtSearchInput" class="form-control form-control-sm" placeholder="Search fields..." style="width: 200px;">
-    </div>
+    </div>-->
 </div>
 
 <div class="row">
     <div class="col-md-12">
-        <div class="card shadow-tbl-outer mb-2 p-2">            
-            <ul class="nav nav-pills nav-pills-sm gap-2" id="moduleTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#student-fields" type="button">Student</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#staff-fields" type="button">Staff</button>
-                </li>
-            </ul>
+        <div class="card shadow-tbl-outer mb-2 p-3">    
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="position-relative border d-flex align-items-center rounded-2 px-3 bg-white">
+                    <i class="fas fa-search search-icon-input"></i>
+                    <input type="text" class="form-control border-0 ps-2" id="txtSearchInput" style="min-width: 220px;" placeholder="Search fields..." />
+                </div>
+                <ul class="nav nav-pills nav-pills-sm gap-2" id="moduleTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#student-fields" type="button">Student</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#staff-fields" type="button">Staff</button>
+                    </li>
+                </ul>
+            </div>
+           
         </div>
     </div>
     <div class="col-md-12">
-        <div class="card shadow-tbl-outer">
-            <div class="card-body p-0">
+        <div class="card shadow-tbl">
+            <div class="card-body">
                 <div class="tab-content" id="pills-tabContent">
                     <!-- Student Fields -->
                     <div class="tab-pane fade show active" id="student-fields" role="tabpanel">

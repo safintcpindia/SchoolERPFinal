@@ -98,14 +98,15 @@
                     <table class="table mb-0" id="tblVisitors">
                         <thead>
                             <tr>
-                                <th style="width: 50px;" class="ps-3">Select</th>
+                                <th style="width: 50px;">Select</th>
                                 <th>Purpose</th>
                                 <th>Meeting With</th>
                                 <th>Visitor Name</th>
                                 <th>Phone</th>
                                 <th>Date</th>
                                 <th>In/Out Time</th>
-                                <th>Action</th>
+                                <th></th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -118,16 +119,16 @@
                                     <td>@item.PurposeName</td>
                                     <td>
                                         @if (item.MeetingWith == "Student") {
-                                            <span class="badge bg-info-light text-info">Student: @item.StudentName</span>
+                                            <span class="badge bg-light rounded-pill fw-normal text-info">Student: @item.StudentName</span>
                                         } else if (item.MeetingWith == "Staff") {
-                                            <span class="badge bg-warning-light text-warning">Staff: @item.StaffName</span>
+                                            <span class="badge bg-light rounded-pill fw-normal text-warning">Staff: @item.StaffName</span>
                                         } else {
                                             <span class="text-muted">-</span>
                                         }
                                     </td>
                                     <td>
-                                        <div class="fw-bold">@item.Name</div>
-                                        <small class="text-muted">@item.IDCard</small>
+                                        <div>@item.Name</div>
+                                        <small>@item.IDCard</small>
                                     </td>
                                     <td>@item.Phone</td>
                                     <td>@item.Date.ToString("dd-MM-yyyy")</td>
@@ -144,6 +145,9 @@
                                                 <i class="ti ti-download"></i>
                                             </a>
                                         }
+                                    </td>
+                                    <td>
+                                        
                                         <div class="form-check form-switch d-inline-block ms-2" onclick="event.stopPropagation()">
                                             <input class="form-check-input" type="checkbox" 
                                                    onchange="toggleStatus(@item.VisitorBookID, this.checked)"

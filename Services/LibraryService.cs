@@ -169,10 +169,18 @@ namespace SchoolERP.Net.Services
                     StaffID = row.Table.Columns.Contains("StaffID") && row["StaffID"] != DBNull.Value ? Convert.ToInt32(row["StaffID"]) : null,
                     LibraryCardNo = row["LibraryCardNo"].ToString(),
                     AdmissionNo = row["AdmissionNo"].ToString(),
-                    Name = memberType != "Staff" ? row["StudentName"].ToString() : row["StaffName"].ToString(),
+                    Name = row.Table.Columns.Contains("MemberName")
+    ? row["MemberName"].ToString()
+    : memberType != "Staff"
+        ? row["StudentName"].ToString()
+        : row["StaffName"].ToString(),
                     MemberType = row.Table.Columns.Contains("MemberType") ? row["MemberType"].ToString() : memberType,
                     //                    ClassName = memberType != "Staff" ? row["ClassName"].ToString() : row["ClassDepartment"].ToString(),
-                    ClassName = memberType == "Staff" ? "" : row["ClassDepartment"].ToString(),
+                    ClassName = row.Table.Columns.Contains("ClassDepartment")
+    ? row["ClassDepartment"].ToString()
+    : row.Table.Columns.Contains("ClassName")
+        ? row["ClassName"].ToString()
+        : "",
                     FatherName = row.Table.Columns.Contains("FatherName") ? row["FatherName"].ToString() : "",
                     DOB = row.Table.Columns.Contains("DOB") && row["DOB"] != DBNull.Value ? Convert.ToDateTime(row["DOB"]) : null,
                     Gender = row["Gender"].ToString(),

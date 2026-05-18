@@ -35,7 +35,7 @@
         @if (canEdit)
         {
             <button type="button" id="btnTopEdit" class="btn btn-info" onclick="handleEdit()" disabled>
-                <i class="ti ti-edit me-1"></i>Edit
+                <i class="ti ti-pencil me-1"></i>Edit
             </button>
         }
         @if (canDelete)
@@ -55,7 +55,12 @@
                 <form method="post" action="/HumanResource/Staffs" id="staffFilterForm">
                     <input type="hidden" name="viewType" id="hdnViewType" value="@Model.ViewType" />
                     <div class="d-flex align-items-center justify-content-between">
-                        <input type="text" name="search" id="txtSearch" class="form-control w-25 me-3" placeholder="Search by name or code..." value="@Model.SearchTerm" />
+                        <div class="position-relative border d-flex align-items-center rounded-2 px-3 ">
+                            <i class="fas fa-search search-icon-input"></i>
+                            <input type="text" class="form-control border-0 ps-2" id="txtSearch"
+                                   placeholder="Search by name or code..." value="@Model.SearchTerm" style="min-width: 220px;">
+                        </div>
+                        <!--<input type="text" name="search" id="txtSearch" class="form-control w-25 me-3" placeholder="Search by name or code..." value="@Model.SearchTerm" />-->
                         <div class="d-flex align-items-center flex-wrap gap-2 flex-shrink-0">
                             <div class="dropdown">
                                 <a href="#" class="btn btn-white border btn-lg" data-bs-toggle="dropdown" data-bs-auto-close="outside">
@@ -63,7 +68,7 @@
                                 </a>
                                 <div class="dropdown-menu dropdown-lg dropdown-menu-end filter-dropdown p-0">
                                     <div class="d-flex align-items-center justify-content-between border-bottom filter-header py-2">
-                                        <h6 class="mb-0 fw-bold px-3">Filter Options</h6>
+                                        <h6 class="mb-0 fw-bold">Select Criteria</h6>
                                         <button type="submit" class="btn text-primary fs-6">Apply</button>
                                     </div>
                                     <div class="p-3">
@@ -97,7 +102,7 @@
                                                 }
                                             </select>
                                         </div>
-                                        <a href="/HumanResource/Staffs" class="btn btn-sm btn-light w-100 mt-2">Reset Filters</a>
+                                        <!--<a href="/HumanResource/Staffs" class="btn btn-sm btn-light w-100 mt-2">Reset Filters</a>-->
                                     </div>
                                 </div>
                             </div>
@@ -139,8 +144,8 @@
                                  <input type="radio" name="staffSelectCard" id="radCard_@s.StaffID" onclick="event.stopPropagation(); selectStaff(@s.StaffID)">
                             </div>
 
-                            <a href="/HumanResource/StaffDetails/@s.StaffID" class="text-dark fw-semibold">
-                                <h6 class="mb-0 text-truncate">@s.FirstName @s.LastName</h6>
+                            <a href="/HumanResource/StaffDetails/@s.StaffID" class="text-primary fw-semibold">
+                                <h6 class="mb-0 text-primary text-truncate">@s.FirstName @s.LastName</h6>
                             </a>
                             <small class="text-muted d-block mb-2 text-truncate">@(s.DesignationName ?? "No Designation")</small>
                             <div class="d-flex flex-column gap-1 text-start fs-13 mt-2 border-top pt-2">
@@ -193,7 +198,7 @@
                                     <td><input type="radio" name="staffSelect" onclick="selectStaff(@s.StaffID)"></td>
                                     <td>@s.StaffCode</td>
                                     <td>
-                                        <a href="/HumanResource/StaffDetails/@s.StaffID">@s.FirstName @s.LastName</a>
+                                        <a href="/HumanResource/StaffDetails/@s.StaffID" class="text-primary">@s.FirstName @s.LastName</a>
                                     </td>
                                     <td>
                                         @if (s.DisplayRoles != null && s.DisplayRoles.Any())

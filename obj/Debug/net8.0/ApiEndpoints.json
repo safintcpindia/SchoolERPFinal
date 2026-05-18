@@ -2846,6 +2846,22 @@
   },
   {
     "ContainingType": "SchoolERP.Net.Controllers.Api.PaymentMethodApiController",
+    "Method": "GetByCompany",
+    "RelativePath": "api/PaymentMethodApi/GetByCompany/{companyId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SchoolERP.Net.Controllers.Api.PaymentMethodApiController",
     "Method": "GetById",
     "RelativePath": "api/PaymentMethodApi/GetById/{id}",
     "HttpMethod": "GET",

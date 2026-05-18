@@ -31,7 +31,7 @@
     <div>
         <h6 class="fw-bold mb-0">Language Management</h6>
     </div>
-    <div class="d-flex flex-wrap align-items-center gap-2">
+    <div class="d-flex flex-wrap align-items-center gap-1">
         @if (canAdd)
         {
             <button class="btn btn-primary shadow-sm" id="btnAddLanguage" onclick="openAddModal()">
@@ -40,8 +40,8 @@
         }
         @if (canEdit)
         {
-            <button id="btnEdit" class="btn btn-success shadow-sm" disabled onclick="editSelected()">
-                <i class="fas fa-edit me-2"></i>Edit
+            <button id="btnEdit" class="btn btn-info shadow-sm" disabled onclick="editSelected()">
+                <i class="fas fa-pencil me-2"></i>Edit
             </button>
         }
         @if (canDelete)
@@ -64,11 +64,11 @@
                                 <th class="ps-4" style="width: 50px;">Select</th>
                                 <th>Title</th>
                                 <th>Code</th>
-                                <th class="text-center">Icon</th>
-                                <th class="text-center">RTL</th>
-                                <th class="text-center">Base</th>
-                                <th class="text-center">Status</th>
-                                <th class="text-center">Created On</th>
+                                <th>Icon</th>
+                                <th>RTL</th>
+                                <th>Base</th>
+                                <th>Status</th>
+                                <th>Created On</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -79,11 +79,11 @@
                                         <input type="radio" name="selectedLanguage" class="form-check-input" value="@l.LanguageId">
                                     </td>
                                     <td>
-                                        <span class="fw-bold">@l.LanguageTitle</span>
+                                        <span>@l.LanguageTitle</span>
                                     </td>
                                     <td>@l.LanguageCode</td>
-                                    <td class="text-center">@l.LanguageIcon</td>
-                                    <td class="text-center">
+                                    <td>@l.LanguageIcon</td>
+                                    <td>
                                         @if (l.LanguageIsRtl)
                                         {
                                             <span class="badge bg-warning text-dark">RTL</span>
@@ -93,13 +93,13 @@
                                             <span class="badge bg-light text-muted border">LTR</span>
                                         }
                                     </td>
-                                    <td class="text-center">
+                                    <td>
                                         @if (l.LanguageBase)
                                         {
                                             <span class="badge bg-primary">Base</span>
                                         }
                                     </td>
-                                    <td class="text-center">
+                                    <td>
                                         @if (canEdit)
                                         {
                                             <div class="form-check form-switch d-flex justify-content-center" onclick="event.stopPropagation()">
@@ -111,7 +111,7 @@
                                             <span class="badge @(l.IsActive ? "bg-success" : "bg-secondary")">@(l.IsActive ? "Active" : "Inactive")</span>
                                         }
                                     </td>
-                                    <td class="text-center"><span class="text-muted small">@l.CreatedOn.ToString("dd MMM yyyy")</span></td>
+                                    <td><span class="">@l.CreatedOn.ToString("dd MMM yyyy")</span></td>
                                 </tr>
                             }
                         </tbody>

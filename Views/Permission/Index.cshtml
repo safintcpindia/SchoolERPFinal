@@ -110,6 +110,7 @@
                                     <th style="width:220px;">Display Label</th>
                                     <th>Status</th>
                                     <th>Created On</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -123,13 +124,15 @@
                                             @p.PermissionName
                                         </td>
                                         <td>@p.DisplayLabel</td>
-                                        <td onclick="event.stopPropagation()">
-                                            <div class="form-check form-switch" asp-permission="Edit" asp-permission-url="/Permission">
-                                                <input class="form-check-input" type="checkbox" checked="@p.IsActive" onchange="toggleStatus(@p.PermissionID, this.checked)">
-                                            </div>
+                                        <td>                                            
                                             <span class="badge @(p.IsActive ? "bg-success" : "bg-secondary")" asp-permission="View" asp-permission-url="/Permission" asp-permission-negate="true">@(p.IsActive ? "Active" : "Inactive")</span>
                                         </td>
                                         <td><span class="text-xs">@p.CreatedOn.ToString("dd MMM yyyy")</span></td>
+                                    <td onclick="event.stopPropagation()">
+                                        <div class="form-check form-switch" asp-permission="Edit" asp-permission-url="/Permission">
+                                            <input class="form-check-input" type="checkbox" checked="@p.IsActive" onchange="toggleStatus(@p.PermissionID, this.checked)">
+                                        </div>
+                                        </td>
                                     </tr>
                                 }
                             </tbody>

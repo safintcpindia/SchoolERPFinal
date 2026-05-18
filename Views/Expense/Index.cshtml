@@ -70,7 +70,7 @@
                     <table class="table mb-0" id="tblExpense">
                         <thead>
                             <tr>
-                                <th style="width: 50px;" class="ps-3">Select</th>
+                                <th style="width: 50px;">Select</th>
                                 <th>Name</th>
                                 <th>Head</th>
                                 <th>Invoice No</th>
@@ -140,7 +140,7 @@
                 </div>
             </div>
             <div class="modal-body">
-                <form id="entryForm">
+                <form id="entryForm" novalidate>
                     <input type="hidden" id="hdnAccountEntryID" value="0">
                     <input type="hidden" id="hdnEntryType" value="Expense">
                     <div class="row row-gap-3">
@@ -153,10 +153,12 @@
                                     <option value="@head.AccountHeadID">@head.HeadName</option>
                                 }
                             </select>
+                            <div class="invalid-feedback">Please select an expense head.</div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="txtName" required>
+                            <div class="invalid-feedback">Please enter a name.</div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Invoice No</label>
@@ -165,10 +167,12 @@
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Date <span class="text-danger">*</span></label>
                             <input type="date" class="form-control" id="txtDate" required value="@DateTime.Today.ToString("yyyy-MM-dd")">
+                            <div class="invalid-feedback">Please select a date.</div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Amount <span class="text-danger">*</span></label>
                             <input type="number" step="0.01" class="form-control" id="txtAmount" required>
+                            <div class="invalid-feedback">Please enter a valid amount.</div>
                         </div>
                         <div class="col-md-12">
                             <label class="form-label fw-bold">Description</label>
@@ -193,6 +197,14 @@
 </div>
 
 @section Scripts {
+<style>
+    .was-validated .select2-hidden-accessible:invalid + .select2-container .select2-selection {
+        border-color: #dc3545 !important;
+    }
+    .was-validated .select2-hidden-accessible:valid + .select2-container .select2-selection {
+        border-color: #198754 !important;
+    }
+</style>
 <script>
     let selectedId = 0;
     const canEdit = @canEdit.ToString().ToLower();
@@ -229,7 +241,9 @@
     function openAddModal() {
         document.getElementById('modalTitle').textContent = 'Add Expense';
         document.getElementById('hdnAccountEntryID').value = 0;
-        document.getElementById('entryForm').reset();
+        const form = document.getElementById('entryForm');
+        form.reset();
+        form.classList.remove('was-validated');
         document.getElementById('txtDate').value = new Date().toISOString().split('T')[0];
         document.getElementById('chkActive').checked = true;
         document.getElementById('currentFile').style.display = 'none';
@@ -245,6 +259,7 @@
                 if (!res.success) { showToast(res.message, 'danger'); return; }
                 const d = res.data;
                 document.getElementById('modalTitle').textContent = 'Edit Expense';
+                document.getElementById('entryForm').classList.remove('was-validated');
                 document.getElementById('hdnAccountEntryID').value = d.accountEntryID;
                 document.getElementById('txtName').value = d.name;
                 document.getElementById('txtInvoiceNo').value = d.invoiceNo || '';
@@ -267,7 +282,8 @@
 
     async function saveRecord() {
         const form = document.getElementById('entryForm');
-        if (!form.checkValidity()) { form.reportValidity(); return; }
+        form.classList.add('was-validated');
+        if (!form.checkValidity()) { return; }
 
         const fileInput = document.getElementById('fileAttachment');
         let fileData = null;

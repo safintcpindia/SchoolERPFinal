@@ -17,6 +17,12 @@
     var canDelete = PermHelper.HasPermissionByUrl("/DownloadCenter/VideoTutorial", "Delete");
 }
 
+<style>
+    .dt-buttons {
+        display: none !important;
+    }
+</style>
+
 <!-- Page Header -->
 <div class="d-flex align-items-sm-center justify-content-between flex-wrap gap-2 mb-2">
     <div>
@@ -41,9 +47,18 @@
                 <i class="ti ti-trash me-1"></i>Delete
             </button>
         }
-        <a href="javascript:window.print();" class="btn btn-secondary d-inline-flex align-items-center">
-            <i class="ti ti-printer me-1"></i>Print
-        </a>
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle d-inline-flex align-items-center" type="button" id="dropdownPrint" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="ti ti-printer me-1"></i>Print
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownPrint">
+                <li><a class="dropdown-item" href="javascript:void(0);" onclick="triggerBtn(0)">Copy</a></li>
+                <li><a class="dropdown-item" href="javascript:void(0);" onclick="triggerBtn(1)">CSV</a></li>
+                <li><a class="dropdown-item" href="javascript:void(0);" onclick="triggerBtn(2)">Excel</a></li>
+                <li><a class="dropdown-item" href="javascript:void(0);" onclick="triggerBtn(3)">PDF</a></li>
+                <li><a class="dropdown-item" href="javascript:void(0);" onclick="triggerBtn(4)">Print</a></li>
+            </ul>
+        </div>
     </div>
 </div>
 
@@ -53,7 +68,12 @@
         <div class="card shadow-tbl-outer mb-2">
             <div class="card-body p-3">
                 <div class="d-flex align-items-center justify-content-between">
-                    <input type="text" id="txtSearch" class="form-control w-25 me-3" placeholder="Search by title..." onkeyup="loadData()" />
+                    <div class="position-relative border d-flex align-items-center rounded-2 px-3 ">
+                        <i class="fas fa-search search-icon-input"></i>
+                        <input type="text" class="form-control border-0 ps-2" id="txtSearch"
+                               placeholder="Search by title..." style="min-width: 220px;" onkeyup="loadData()">
+                    </div>
+                    <!--<input type="text" id="txtSearch" class="form-control w-25 me-3" placeholder="Search by title..." onkeyup="loadData()" />-->
                     
                     <div class="d-flex align-items-center flex-wrap gap-2 flex-shrink-0">
                         <div class="dropdown">
@@ -197,6 +217,15 @@
             $('#ddlFilterClass').change(function () {
                 onClassChange('ddlFilterClass', 'ddlFilterSection', true);
             });
+
+            $(document).on('change', '.status-toggle', function () {
+                const id = $(this).data('id');
+                toggleStatus(id);
+            });
+
+            $(document).on('click', '.status-toggle', function (e) {
+                e.stopPropagation();
+            });
         });
 
         function onClassChange(classId, sectionId, isFilter = false) {
@@ -213,6 +242,15 @@
             }
         }
 
+        function triggerBtn(index) {
+            if ($.fn.DataTable.isDataTable('#tblVideoTutorial')) {
+                const table = $('#tblVideoTutorial').DataTable();
+                table.button(index).trigger();
+            } else {
+                showToast('No data available to export', 'warning');
+            }
+        }
+
         function loadData() {
             const search = $('#txtSearch').val();
             const classId = $('#ddlFilterClass').val();
@@ -220,6 +258,10 @@
             
             selectedId = 0;
             $('#btnEdit, #btnDelete').prop('disabled', true);
+
+            if ($.fn.DataTable.isDataTable('#tblVideoTutorial')) {
+                $('#tblVideoTutorial').DataTable().destroy();
+            }
 
             $.get('/DownloadCenter/GetVideoTutorialList', { classId, sectionId, search }, function (res) {
                 let html = '';
@@ -234,7 +276,7 @@
                                 <td>${new Date(item.createdOn).toLocaleDateString('en-GB')}</td>
                                 <td>
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" ${item.isActive ? 'checked' : ''} onchange="toggleStatus(${item.videoID})">
+                                        <input class="form-check-input status-toggle" type="checkbox" ${item.isActive ? 'checked' : ''} data-id="${item.videoID}">
                                     </div>
                                 </td>
                             </tr>
@@ -244,6 +286,57 @@
                     html = '<tr><td colspan="7" class="text-center py-4 text-muted">No records found.</td></tr>';
                 }
                 $('#listBody').html(html);
+                
+                if (res.success && res.data.length > 0) {
+                    $('#tblVideoTutorial').DataTable({
+                        destroy: true,
+                        responsive: true,
+                        pageLength: 10,
+                        lengthMenu: [
+                            [10, 25, 50, 100],
+                            [10, 25, 50, 100]
+                        ],
+                        dom: 'Brtip',
+                        buttons: [
+                            {
+                                extend: 'copy',
+                                className: 'btn btn-secondary btn-sm',
+                                exportOptions: {
+                                    columns: [1, 3, 4]
+                                }
+                            },
+                            {
+                                extend: 'csv',
+                                className: 'btn btn-info btn-sm',
+                                exportOptions: {
+                                    columns: [1, 3, 4]
+                                }
+                            },
+                            {
+                                extend: 'excel',
+                                className: 'btn btn-success btn-sm',
+                                exportOptions: {
+                                    columns: [1, 3, 4]
+                                }
+                            },
+                            {
+                                extend: 'pdf',
+                                className: 'btn btn-danger btn-sm',
+                                exportOptions: {
+                                    columns: [1, 3, 4]
+                                }
+                            },
+                            {
+                                extend: 'print',
+                                className: 'btn btn-primary btn-sm',
+                                exportOptions: {
+                                    columns: [1, 3, 4]
+                                }
+                            }
+                        ]
+                    });
+                }
+
                 renderFilterBadges();
             });
         }
@@ -302,10 +395,10 @@
             const el = document.getElementById(filterId);
             if (!el) return;
 
-            if (el.tagName === 'INPUT') {
-                el.value = '';
-            } else {
-                el.value = '';
+            el.value = '';
+
+            if (filterId === 'ddlFilterClass') {
+                onClassChange('ddlFilterClass', 'ddlFilterSection', true);
             }
 
             loadData();
@@ -314,7 +407,7 @@
         function resetAllFilters() {
             document.getElementById('txtSearch').value = '';
             document.getElementById('ddlFilterClass').value = '';
-            document.getElementById('ddlFilterSection').value = '';
+            onClassChange('ddlFilterClass', 'ddlFilterSection', true);
             
             loadData();
         }
@@ -338,18 +431,19 @@
             if (selectedId <= 0) return;
             $.get('/DownloadCenter/GetVideoTutorial', { id: selectedId }, function (res) {
                 if (res.success) {
+        
                     $('#hdnId').val(res.data.videoID);
                     $('#txtTitle').val(res.data.title);
                     $('#txtLink').val(res.data.videoLink);
                     $('#txtDescription').val(res.data.description);
-                    $('#ddlClass').val(res.data.classId);
+                    $('#ddlClass').val(res.data.classID);
                     
                     // Load sections then set value
                     const $sec = $('#ddlSection');
                     $sec.empty().append('<option value="">Select Section</option>');
-                    $.get('/DownloadCenter/GetSections', { classId: res.data.classId }, function (sections) {
+                    $.get('/DownloadCenter/GetSections', { classId: res.data.classID }, function (sections) {
                         sections.forEach(s => {
-                            $sec.append(`<option value="${s.sectionID}" ${s.sectionID == res.data.sectionId ? 'selected' : ''}>${s.sectionName}</option>`);
+                            $sec.append(`<option value="${s.sectionID}" ${s.sectionID == res.data.sectionID ? 'selected' : ''}>${s.sectionName}</option>`);
                         });
                         $('#modalTitle').text('Edit Video Tutorial');
                         $('#upsertModal').modal('show');

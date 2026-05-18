@@ -17,11 +17,18 @@
 }
 
 <!-- Page Header -->
-<div class="d-flex align-items-sm-center justify-content-between flex-wrap gap-2 mb-2">
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
     <div>
         <h6 class="fw-bold mb-0">Upload & Share Content</h6>
     </div>
     <div class="d-flex align-items-center flex-wrap gap-1">
+       
+        @if (canDelete)
+        {
+            <button id="btnDelete" class="btn btn-danger d-inline-flex align-items-center" disabled onclick="deleteSelected()">
+                <i class="ti ti-trash me-1"></i>Delete Selected
+            </button>
+        }
         @if (canAdd)
         {
             <button class="btn btn-primary d-inline-flex align-items-center" onclick="openGenModal()">
@@ -29,12 +36,6 @@
             </button>
             <button class="btn btn-dark d-inline-flex align-items-center" onclick="openUploadModal()">
                 <i class="ti ti-cloud-upload me-1"></i>Upload Content
-            </button>
-        }
-        @if (canDelete)
-        {
-            <button id="btnDelete" class="btn btn-danger d-inline-flex align-items-center" disabled onclick="deleteSelected()">
-                <i class="ti ti-trash me-1"></i>Delete Selected
             </button>
         }
     </div>
@@ -46,13 +47,31 @@
         <div class="card shadow-tbl-outer mb-2">
             <div class="card-body p-3">
                 <div class="d-flex align-items-center justify-content-between">
-                    <input type="text" id="txtSearch" class="form-control w-25" placeholder="Search by title..." onkeyup="loadData()" />
+                    <div class="position-relative border d-flex align-items-center rounded-2 px-3 bg-white">
+                        <i class="fas fa-search search-icon-input"></i>
+                        <input type="text" class="form-control border-0 ps-2" id="txtSearch"
+                               placeholder="Search by title..." style="min-width: 220px;" onkeyup="loadData()">
+                    </div>
+                    <div class="bg-white border border-muted rounded px-1 py-1 text-center d-flex align-items-center justify-content-center">
+                        <a href="#list-v" id="list-view-btn" class="btn rounded d-flex align-items-center justify-content-center active">
+                            <i class="ti ti-list fs-14 text-body"></i>
+                        </a>
+                        <a href="#card-v" id="card-view-btn" class="btn rounded d-flex align-items-center justify-content-center">
+                            <i class="ti ti-layout-grid fs-14 text-body"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="col-xl-12">
+    <div class="col-xl-12 d-none" id="card-v">
+        <div class="row" id="cardContainer">
+            <!-- Cards will be loaded here -->
+        </div>
+    </div>
+
+    <div class="col-xl-12" id="list-v">
         <div class="card shadow-tbl overflow-auto">
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -103,6 +122,7 @@
                         <div class="col-md-12">
                             <label class="form-label">Title <span class="text-danger">*</span></label>
                             <input type="text" id="upTitle" class="form-control" required placeholder="Enter content title">
+                            <span class="text-danger small d-none" id="err-upTitle">Title is required.</span>
                         </div>
                         <div class="col-md-12">
                             <label class="form-label">Content Type <span class="text-danger">*</span></label>
@@ -113,6 +133,7 @@
                                     <option value="@t.ContentTypeID">@t.TypeName</option>
                                 }
                             </select>
+                            <span class="text-danger small d-none" id="err-upType">Please select a content type.</span>
                         </div>
                         <div class="col-md-12">
                             <label class="form-label">Upload File</label>
@@ -124,6 +145,7 @@
                         <div class="col-md-12">
                             <label class="form-label">Youtube / Video Link</label>
                             <input type="url" id="upLink" class="form-control" placeholder="https://..." oninput="clearFile()">
+                            <span class="text-danger small d-none" id="err-upFile">Please upload a file or provide a link.</span>
                         </div>
                     </div>
                 </form>
@@ -152,6 +174,7 @@
                     <div class="col-md-12">
                         <label class="form-label">Share Title <span class="text-danger">*</span></label>
                         <input type="text" id="genTitle" class="form-control" required placeholder="e.g., Weekly Assignments">
+                        <span class="text-danger small d-none" id="err-genTitle">Share title is required.</span>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Share Date</label>
@@ -185,35 +208,94 @@
     <script>
         $(document).ready(function () {
             loadData();
+
+            $(document).on('change', '.content-check', function() {
+                const val = $(this).val();
+                const checked = $(this).prop('checked');
+                $(`.content-check[value="${val}"]`).prop('checked', checked);
+                updateSelection();
+            });
+
+            $('#list-view-btn').click(function (e) {
+                e.preventDefault();
+                $('#card-v').addClass('d-none');
+                $('#list-v').removeClass('d-none');
+                $(this).addClass('active');
+                $('#card-view-btn').removeClass('active');
+                updateSelection();
+            });
+
+            $('#card-view-btn').click(function (e) {
+                e.preventDefault();
+                $('#list-v').addClass('d-none');
+                $('#card-v').removeClass('d-none');
+                $(this).addClass('active');
+                $('#list-view-btn').removeClass('active');
+                updateSelection();
+            });
         });
 
         function loadData() {
             const search = $('#txtSearch').val();
             $.get('/DownloadCenter/GetContentList', { search }, function (res) {
-                let html = '';
+                let listHtml = '';
+                let cardHtml = '';
                 if (res.success && res.data.length > 0) {
                     res.data.forEach(item => {
-                        html += `
+                        listHtml += `
                             <tr>
-                                <td class="ps-3"><input type="checkbox" name="rowCheck" class="form-check-input content-check" value="${item.contentID}" data-title="${item.title}" onchange="updateSelection()"></td>
+                                <td class="ps-3"><input type="checkbox" name="rowCheck" class="form-check-input content-check" value="${item.contentID}" data-title="${item.title}"></td>
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <i class="ti ti-${item.fileType == 'File' ? 'file-description' : 'brand-youtube'} me-2 text-${item.fileType == 'File' ? 'info' : 'danger'}"></i>
                                         <a href="${item.filePath}" target="_blank" class="">${item.title}</a>
                                     </div>
                                 </td>
-                                <td><span class="badge bg-light text-dark border">${item.contentTypeName}</span></td>
+                                <td><span class="badge bg-light text-dark border fw-normal">${item.contentTypeName}</span></td>
                                 <td>${item.fileType}</td>
                                 <td>${item.fileSize}</td>
                                 <td>${item.uploadBy}</td>
                                 <td>${new Date(item.createdOn).toLocaleString('en-GB')}</td>
                             </tr>
                         `;
+
+                        cardHtml += `
+                            <div class="col-xl-6 col-md-12 content-item-card">
+                                <div class="card shadow-tbl-outer mb-2">
+                                    <div class="card-body d-flex align-items-center flex-sm-nowrap flex-wrap row-gap-3 position-relative">
+                                        <input type="checkbox" name="rowCheck" class="form-check-input content-check position-absolute" style="top:10px;left:10px;" value="${item.contentID}" data-title="${item.title}">
+                                        <div class="me-3 d-flex align-items-center ps-3">
+                                            <div class="file-icon-img d-flex align-items-center justify-content-center bg-light rounded" style="width: 60px; height: 60px;">
+                                                <i class="ti ti-${item.fileType == 'File' ? 'file-description' : 'brand-youtube'} fs-1 text-${item.fileType == 'File' ? 'info' : 'danger'}"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1 fs-15">
+                                                <a href="${item.filePath}" target="_blank" class="text-primary">${item.title}</a>
+                                            </h6>
+                                            <div class="d-flex justify-content-between mb-1 gap-2">
+                                                <div class="flex-fill">
+                                                    <p class="mb-1 fs-13"><span class="text-dark">Type</span> : ${item.contentTypeName}</p>
+                                                    <p class="mb-1 fs-13"><span class="text-dark">Format</span> : ${item.fileType}</p>
+                                                    <p class="mb-1 fs-13"><span class="text-dark">Size</span> : ${item.fileSize}</p>
+                                                </div>
+                                                <div class="flex-fill">
+                                                    <p class="mb-1 fs-13"><span class="text-dark">Upload By</span> : ${item.uploadBy}</p>
+                                                    <p class="mb-1 fs-13"><span class="text-dark">Date</span> : ${new Date(item.createdOn).toLocaleDateString('en-GB')}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
                     });
                 } else {
-                    html = '<tr><td colspan="7" class="text-center py-4 text-muted">No content found.</td></tr>';
+                    listHtml = '<tr><td colspan="7" class="text-center py-4 text-muted">No content found.</td></tr>';
+                    cardHtml = '<div class="col-12 text-center py-4 text-muted">No content found.</div>';
                 }
-                $('#listBody').html(html);
+                $('#listBody').html(listHtml);
+                $('#cardContainer').html(cardHtml);
                 updateSelection();
             });
         }
@@ -225,7 +307,7 @@
         }
 
         function updateSelection() {
-            const selected = $('.content-check:checked');
+            const selected = $('#list-v:visible, #card-v:visible').find('.content-check:checked');
             $('#btnDelete').prop('disabled', selected.length === 0);
             
             let html = '';
@@ -250,15 +332,35 @@
             const file = $('#upFile')[0].files[0];
             const link = $('#upLink').val().trim();
 
-            if (!title || !type) {
-                showToast('Title and Type are required', 'warning');
-                return;
+            // Reset errors
+            $('#err-upTitle').addClass('d-none');
+            $('#err-upType').addClass('d-none');
+            $('#err-upFile').addClass('d-none');
+            $('#upTitle').removeClass('is-invalid');
+            $('#upType').removeClass('is-invalid');
+            $('#upLink').removeClass('is-invalid');
+            $('#upFile').removeClass('is-invalid');
+
+            let isValid = true;
+
+            if (!title) {
+                $('#err-upTitle').removeClass('d-none');
+                $('#upTitle').addClass('is-invalid');
+                isValid = false;
+            }
+            if (!type) {
+                $('#err-upType').removeClass('d-none');
+                $('#upType').addClass('is-invalid');
+                isValid = false;
+            }
+            if (!file && !link) {
+                $('#err-upFile').removeClass('d-none');
+                $('#upLink').addClass('is-invalid');
+                $('#upFile').addClass('is-invalid');
+                isValid = false;
             }
 
-            if (!file && !link) {
-                showToast('Please upload a file or provide a link', 'warning');
-                return;
-            }
+            if (!isValid) return;
 
             const formData = new FormData();
             formData.append('title', title);
@@ -285,7 +387,7 @@
         }
 
         function openGenModal() {
-            const selected = $('.content-check:checked');
+            const selected = $('#list-v:visible, #card-v:visible').find('.content-check:checked');
             if (selected.length === 0) {
                 Swal.fire('Selection Required', 'Please select at least one document to share.', 'warning');
                 return;
@@ -296,13 +398,19 @@
 
         function generateLink() {
             const title = $('#genTitle').val().trim();
+            
+            // Reset errors
+            $('#err-genTitle').addClass('d-none');
+            $('#genTitle').removeClass('is-invalid');
+
             if (!title) {
-                showToast('Share title is required', 'warning');
+                $('#err-genTitle').removeClass('d-none');
+                $('#genTitle').addClass('is-invalid');
                 return;
             }
 
             const ids = [];
-            $('.content-check:checked').each(function () {
+            $('#list-v:visible, #card-v:visible').find('.content-check:checked').each(function () {
                 ids.push(parseInt($(this).val()));
             });
 
@@ -339,7 +447,7 @@
         }
 
         function deleteSelected() {
-            const selected = $('.content-check:checked');
+            const selected = $('#list-v:visible, #card-v:visible').find('.content-check:checked');
             if (selected.length === 0) return;
 
             Swal.fire({

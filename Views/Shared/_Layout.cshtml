@@ -322,7 +322,7 @@
                             <div class="d-flex align-items-center gap-2">
                                 <img src="~/assets/img/users/user-01.jpg" width="32" class="rounded-circle d-flex" alt="user-image">
                                 @* <span class="online text-success"><i class="ti ti-circle-filled d-flex bg-white rounded-circle border border-1 border-white"></i></span> *@
-                                <span class="fw-semibold">@User.Identity.Name <i class="ti ti-chevron-down"></i></span>
+                                <span class="fw-semibold username-header">@User.Identity.Name <i class="ti ti-chevron-down"></i></span>
                             </div>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end dropdown-menu-md p-2">
@@ -690,6 +690,32 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <!-- DataTable CSS -->
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
+
+
+    <!-- DataTable Core -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <!-- Buttons -->
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+
+    <!-- Export Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+    <!-- Export Buttons -->
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 
     <script>
         const input = document.getElementById("txtBackDaysAllow");
@@ -1144,6 +1170,93 @@
             calendarGrid.appendChild(dayDiv);
         }
 
+    </script>
+    <script>
+        /**
+         * Global Table Sorting
+         * Automatically adds sorting to tables with class 'table'
+         */
+        $(document).ready(function() {
+            document.querySelectorAll('table.table:not(.dataTable)').forEach(table => {
+                if (table.getAttribute('data-manual-sort') === 'true') return;
+
+                const thead = table.querySelector('thead');
+                const tbody = table.querySelector('tbody');
+                if (!thead || !tbody) return;
+
+                const headers = thead.querySelectorAll('th');
+                headers.forEach((header, index) => {
+                    const headerText = header.innerText.trim().toLowerCase();
+                    if (headerText === 'select' || headerText === 'action' || headerText === 'status' || headerText === '') {
+                        return;
+                    }
+
+                    if (!header.querySelector('i.fa-sort')) {
+                        const icon = document.createElement('i');
+                        icon.className = 'fas fa-sort text-muted ms-1';
+                        header.appendChild(icon);
+                    }
+
+                    header.style.cursor = 'pointer';
+                    header.addEventListener('click', function() {
+                        const rows = Array.from(tbody.querySelectorAll('tr'));
+                        const validRows = rows.filter(row => !row.querySelector('td[colspan]'));
+                        
+                        if (validRows.length <= 1) return;
+
+                        const isAscending = header.dataset.order !== 'asc';
+                        
+                        validRows.sort((a, b) => {
+                            if (index >= a.cells.length || index >= b.cells.length) return 0;
+                            
+                            let aCol = a.cells[index].innerText.trim();
+                            let bCol = b.cells[index].innerText.trim();
+                            
+                            const aSort = a.cells[index].getAttribute('data-sort');
+                            const bSort = b.cells[index].getAttribute('data-sort');
+                            
+                            if (aSort !== null && bSort !== null) {
+                                aCol = aSort;
+                                bCol = bSort;
+                                const aNum = parseFloat(aCol);
+                                const bNum = parseFloat(bCol);
+                                if (!isNaN(aNum) && !isNaN(bNum)) {
+                                    return isAscending ? aNum - bNum : bNum - aNum;
+                                }
+                            } else {
+                                const aClean = aCol.replace(/[^\d.-]/g, '');
+                                const bClean = bCol.replace(/[^\d.-]/g, '');
+                                const aNum = parseFloat(aClean);
+                                const bNum = parseFloat(bClean);
+                                
+                                if (aClean !== '' && bClean !== '' && !isNaN(aNum) && !isNaN(bNum) && 
+                                    /^-?\d+(\.\d+)?$/.test(aClean) && /^-?\d+(\.\d+)?$/.test(bClean)) {
+                                    return isAscending ? aNum - bNum : bNum - aNum;
+                                }
+                            }
+                            
+                            return isAscending ? aCol.localeCompare(bCol, undefined, {numeric: true, sensitivity: 'base'}) : bCol.localeCompare(aCol, undefined, {numeric: true, sensitivity: 'base'});
+                        });
+                        
+                        validRows.forEach(row => tbody.appendChild(row));
+                        header.dataset.order = isAscending ? 'asc' : 'desc';
+                        
+                        headers.forEach((h) => {
+                            const icon = h.querySelector('i');
+                            if (icon) {
+                                if (h === header) {
+                                    icon.className = isAscending ? 'fas fa-sort-up ms-1' : 'fas fa-sort-down ms-1';
+                                    icon.classList.remove('text-muted');
+                                } else {
+                                    icon.className = 'fas fa-sort text-muted ms-1';
+                                    h.dataset.order = '';
+                                }
+                            }
+                        });
+                    });
+                });
+            });
+        });
     </script>
 </body>
 

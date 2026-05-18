@@ -178,7 +178,7 @@
                     <div class="card shadow-tbl h-100">
                         <div class="card-header d-flex justify-content-between align-items-center bg-light-subtle">
                             <div>
-                                <h6 class="card-title mb-0 fw-bold">${s.fullName}</h6>
+                                <h6 class="card-title mb-0 fs-12">${s.fullName}</h6>
                                 <small class="text-muted">${s.rollNo || 'No Roll No'}</small>
                             </div>
                             <div>
@@ -189,9 +189,8 @@
                             </div>
                         </div>
                         <div class="card-body p-0">
-                            <div class="px-3 py-2 border-bottom bg-light">
-                                <small class="fw-bold text-uppercase text-muted" style="font-size: 10px;">Primary Enrollment</small>
-                                <div class="d-flex gap-3 mt-1">
+                            <div class="px-3 py-2 border-bottom">                                
+                                <div class="d-flex gap-3">
                                     <span><strong>Class:</strong> ${s.primaryClassName}</span>
                                     <span><strong>Section:</strong> ${s.primarySectionName}</span>
                                 </div>
@@ -229,11 +228,11 @@
                     </div>
                     <div class="col-md-3 d-flex gap-1">
                         ${canAdd || canEdit ? `
-                        <button class="btn btn-success btn-sm flex-fill" onclick="saveMultiClass('${rowId}', ${studentId})">
+                        <button class="btn btn-success flex-fill" onclick="saveMultiClass('${rowId}', ${studentId})">
                             <i class="ti ti-cloud"></i>
                         </button>` : ''}
                         ${canDelete ? `
-                        <button class="btn btn-danger btn-sm flex-fill" onclick="removeMultiClassRow('${rowId}', ${data ? data.multiClassID : 0})">
+                        <button class="btn btn-danger flex-fill" onclick="removeMultiClassRow('${rowId}', ${data ? data.multiClassID : 0})">
                             <i class="ti ti-trash"></i>
                         </button>` : ''}
                     </div>

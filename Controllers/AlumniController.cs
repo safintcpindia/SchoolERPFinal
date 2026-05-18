@@ -78,14 +78,15 @@ namespace SchoolERP.Net.Controllers
         [HttpPost]
         public IActionResult DeleteEvent(int id)
         {
-            var result = _eventService.DeleteEvent(id, GetCompanyId());
+            var userId = GetUserId();
+            var result = _eventService.DeleteEvent(id, GetCompanyId(),userId);
             return Json(new { success = result.Success, message = result.Message });
         }
 
         [HttpPost]
         public IActionResult ToggleStatus(int id, bool isActive)
         {
-            var result = _eventService.ToggleEventStatus(id, isActive, GetCompanyId());
+            var result = _eventService.ToggleEventStatus(id, isActive, GetCompanyId(),GetUserId());
             return Json(new { success = result.Success, message = result.Message });
         }
 

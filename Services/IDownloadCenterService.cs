@@ -9,14 +9,14 @@ namespace SchoolERP.Net.Services
         ContentTypeViewModel GetContentTypeById(int id);
         (bool Success, string Message) UpsertContentType(ContentTypeUpsertRequest req, int companyId, int userId);
         (bool Success, string Message) DeleteContentType(int id, int userId);
-        (bool Success, string Message) ToggleContentTypeStatus(int id, int userId);
+        (bool Success, string Message) ToggleContentTypeStatus(int id, int userId,int companyId);
 
         // Video Tutorials
         List<VideoTutorialViewModel> GetVideoTutorialList(int companyId, int? classId, int? sectionId, string? searchTerm);
         VideoTutorialViewModel GetVideoTutorialById(int id);
         (bool Success, string Message) UpsertVideoTutorial(VideoTutorialUpsertRequest req, int companyId, int userId);
         (bool Success, string Message) DeleteVideoTutorial(int id, int userId);
-        (bool Success, string Message) ToggleVideoTutorialStatus(int id, int userId);
+        (bool Success, string Message) ToggleVideoTutorialStatus(int id, int userId,int companyId);
 
         // Upload Content
         List<ContentViewModel> GetContentList(int companyId, string? searchTerm);

@@ -84,12 +84,13 @@ namespace SchoolERP.Net.Services
             return (false, "Operation failed");
         }
 
-        public (bool Success, string Message) DeleteEvent(int eventId, int companyId)
+        public (bool Success, string Message) DeleteEvent(int eventId, int companyId,int userId)
         {
             var parameters = new List<SqlParameter>
             {
                 new SqlParameter("@Action", "DELETE"),
                 new SqlParameter("@EventID", eventId),
+                new SqlParameter("@UserID", userId),
                 new SqlParameter("@CompanyID", companyId)
             };
 
@@ -101,14 +102,15 @@ namespace SchoolERP.Net.Services
             return (false, "Deletion failed");
         }
 
-        public (bool Success, string Message) ToggleEventStatus(int eventId, bool isActive, int companyId)
+        public (bool Success, string Message) ToggleEventStatus(int eventId, bool isActive, int companyId,int userId)
         {
             var parameters = new List<SqlParameter>
             {
                 new SqlParameter("@Action", "TOGGLE_STATUS"),
                 new SqlParameter("@EventID", eventId),
                 new SqlParameter("@IsActive", isActive),
-                new SqlParameter("@CompanyID", companyId)
+                new SqlParameter("@CompanyID", companyId),
+                new SqlParameter("@UserID", userId)
             };
 
             var dt = _sqlHelper.ExecuteQuery("sp_AlumniEvents_CRUD", parameters.ToArray());

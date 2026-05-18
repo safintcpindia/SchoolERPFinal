@@ -92,7 +92,7 @@ namespace SchoolERP.Net.Services
                     new SqlParameter("@InvoiceNo", (object?)req.InvoiceNo ?? DBNull.Value),
                     new SqlParameter("@Date", req.Date),
                     new SqlParameter("@Amount", req.Amount),
-                    new SqlParameter("@AttachDoc", (object?)req.AttachDoc ?? DBNull.Value),
+                    new SqlParameter("@AttachDoc", SqlDbType.VarBinary) { Value = (object?)req.AttachDoc ?? DBNull.Value },
                     new SqlParameter("@AttachDocType", (object?)req.AttachDocType ?? DBNull.Value),
                     new SqlParameter("@AttachDocName", (object?)req.AttachDocName ?? DBNull.Value),
                     new SqlParameter("@Description", (object?)req.Description ?? DBNull.Value),

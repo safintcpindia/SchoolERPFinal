@@ -68,7 +68,7 @@
                     <table class="table mb-0" id="tblHostel">
                         <thead>
                             <tr>
-                                <th style="width: 50px;" class="ps-3">Select</th>
+                                <th style="width: 50px;">Select</th>
                                 <th>Hostel Name</th>
                                 <th>Room Type</th>
                                 <th>Intake</th>
@@ -136,7 +136,7 @@
                             <label class="form-label fw-bold">Room Type <span class="text-danger">*</span></label>
                             <select class="form-select" id="ddlRoomType" required style="width: 100%;">
                                 <option value="">-- Select --</option>
-                                @foreach (var rt in Model.RoomTypes)
+                                @foreach (var rt in Model.RoomTypes.Where(x => x.IsActive))
                                 {
                                     <option value="@rt.RoomTypeID">@rt.RoomTypeTitle</option>
                                 }

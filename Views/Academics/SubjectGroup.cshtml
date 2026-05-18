@@ -59,7 +59,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="card shadow-tbl-outer mb-2">
-            <div class="card-body">
+            <div class="card-body p-3">
                 <div class="d-flex align-items-center justify-content-between">
                     <div class="position-relative border d-flex align-items-center rounded-2 px-3 bg-white">
                         <i class="fas fa-search search-icon-input"></i>
@@ -82,7 +82,7 @@
                                 <div class="filter-body pb-0 p-3">
                                     <div class="mb-3">
                                         <label class="form-label mb-1">Class</label>
-                                        <select id="filterClass" class="form-select form-control select2" onchange="loadSectionsByClass(this.value, 'filterSection')">
+                                        <select id="filterClass" class="form-select select2" onchange="loadSectionsByClass(this.value, 'filterSection')">
                                             <option value="">All Classes</option>
                                             @foreach (var c in Model.Classes)
                                             {
@@ -92,7 +92,7 @@
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label mb-1">Section</label>
-                                        <select id="filterSection" class="form-select form-control select2">
+                                        <select id="filterSection" class="form-select select2">
                                             <option value="">All Sections</option>
                                         </select>
                                     </div>
@@ -151,7 +151,7 @@
                                             {
                                                 foreach (var sub in g.SubjectNames.Split(','))
                                                 {
-                                                    <span class="badge bg-light text-dark border me-1 mb-1">@sub.Trim()</span>
+                                                    <span class="badge bg-light fw-normal text-dark border me-1 mb-1">@sub.Trim()</span>
                                                 }
                                             }
                                         </td>
@@ -205,12 +205,12 @@
                 <form id="itemForm">
                     <input type="hidden" id="txtItemId" value="0">
                     <div class="row row-gap-3">
-                        <div class="col-md-12">
+                        <div class="col-md-8">
                             <label class="form-label">Name <span class="text-danger">*</span></label>
                             <input type="text" id="txtName" class="form-control" placeholder="Group Name" autocomplete="off">
                             <div class="invalid-feedback" id="errTxtName"></div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label">Class <span class="text-danger">*</span></label>
                             <select id="ddlClass" class="form-select form-control" onchange="loadSectionsByClass(this.value, 'ddlSections')">
                                 <option value="">Select Class</option>
@@ -221,7 +221,7 @@
                             </select>
                             <div class="invalid-feedback" id="errDdlClass"></div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <label class="form-label">Section <span class="text-danger">*</span></label>
                             <select id="ddlSections" class="form-select form-control select2" multiple data-placeholder="Select Sections">
                                 @* Sections populated dynamically based on class *@
@@ -245,7 +245,7 @@
                         <div class="col-md-12">
                             <div class="form-check form-switch mt-2">
                                 <input class="form-check-input" type="checkbox" id="isActive" checked>
-                                <label class="form-check-label fw-semibold" for="isActive">Active Status</label>                        
+                                <label class="form-check-label" for="isActive">Active Status</label>                        
                             </div>
                         </div>
                     </div>
@@ -257,16 +257,19 @@
 
 
 @section Styles {
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!--<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />-->
     <style>
-        .select2-container { width: 100% !important; }
-        .select2-dropdown { z-index: 1060; }
-        .item-row.bg-light-primary { background-color: rgba(13, 110, 253, 0.05); }
+        .select2-container--default .select2-selection--multiple {
+            padding-bottom: 0px; 
+            margin-top: 0px; 
+            border: 1px solid #33333340 !important;
+            padding-left: 5px;
+        }
     </style>
 }
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!--<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>-->
     <script>
         const permCanAdd = @Html.Raw(JsonSerializer.Serialize(canAdd));
         const permCanEdit = @Html.Raw(JsonSerializer.Serialize(canEdit));

@@ -90,14 +90,15 @@ namespace SchoolERP.Net.Services
             catch (Exception ex) { return (false, ex.Message); }
         }
 
-        public (bool Success, string Message) ToggleContentTypeStatus(int id, int userId)
+        public (bool Success, string Message) ToggleContentTypeStatus(int id, int userId,int companyId)
         {
             try
             {
                 var p = new[] {
                     new SqlParameter("@Action", "TOGGLESTATUS"),
                     new SqlParameter("@ContentTypeID", id),
-                    new SqlParameter("@UserID", userId)
+                    new SqlParameter("@UserID", userId),
+                    new SqlParameter("@CompanyID",companyId)
                 };
                 var dt = _db.ExecuteQuery("sp_Download_ContentType_CRUD", p);
                 return (Convert.ToInt32(dt.Rows[0]["Result"]) == 1, dt.Rows[0]["Message"].ToString()!);
@@ -146,14 +147,15 @@ namespace SchoolERP.Net.Services
             var dt = _db.ExecuteQuery("sp_Download_VideoTutorial_CRUD", p);
             if (dt.Rows.Count == 0) return null;
             var row = dt.Rows[0];
+            
             return new VideoTutorialViewModel
             {
                 VideoID = Convert.ToInt32(row["VideoID"]),
                 Title = row["Title"].ToString(),
                 VideoLink = row["VideoLink"].ToString(),
                 Description = row["Description"].ToString(),
-                ClassID = row["ClassID"] != DBNull.Value ? Convert.ToInt32(row["ClassID"]) : null,
-                SectionID = row["SectionID"] != DBNull.Value ? Convert.ToInt32(row["SectionID"]) : null,
+                ClassID = dt.Columns.Contains("ClassID") && row["ClassID"] != DBNull.Value ? Convert.ToInt32(row["ClassID"]) : null,
+                SectionID = dt.Columns.Contains("SectionID") && row["SectionID"] != DBNull.Value ? Convert.ToInt32(row["SectionID"]) : null,
                 IsActive = Convert.ToBoolean(row["IsActive"])
             };
         }
@@ -194,14 +196,15 @@ namespace SchoolERP.Net.Services
             catch (Exception ex) { return (false, ex.Message); }
         }
 
-        public (bool Success, string Message) ToggleVideoTutorialStatus(int id, int userId)
+        public (bool Success, string Message) ToggleVideoTutorialStatus(int id, int userId,int companyId)
         {
             try
             {
                 var p = new[] {
                     new SqlParameter("@Action", "TOGGLESTATUS"),
                     new SqlParameter("@VideoID", id),
-                    new SqlParameter("@UserID", userId)
+                    new SqlParameter("@UserID", userId),
+                    new SqlParameter("@CompanyID", companyId)
                 };
                 var dt = _db.ExecuteQuery("sp_Download_VideoTutorial_CRUD", p);
                 return (Convert.ToInt32(dt.Rows[0]["Result"]) == 1, dt.Rows[0]["Message"].ToString()!);
