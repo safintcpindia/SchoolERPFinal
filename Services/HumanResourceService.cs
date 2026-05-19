@@ -15,10 +15,12 @@ namespace SchoolERP.Net.Services
     {
         private readonly SqlHelper _db;
         private readonly IUserService _userService;
-        public HumanResourceService(SqlHelper db, IUserService userService)
+        private readonly IFieldService _fieldService;
+        public HumanResourceService(SqlHelper db, IUserService userService, IFieldService fieldService)
         {
             _db = db;
             _userService = userService;
+            _fieldService = fieldService;
         }
 
         // --- Designation ---
@@ -412,9 +414,36 @@ namespace SchoolERP.Net.Services
                     var allRoles = _userService.GetRoles();
                     var roleMap = allRoles.ToDictionary(r => r.RoleID, r => r.RoleName);
 
+                    // Fetch all custom field values for staff once to avoid N+1 queries
+                    var customVals = new Dictionary<int, List<StudentCustomFieldValueViewModel>>();
+                    try
+                    {
+                        var customDt = _db.ExecuteQuery("sp_HR_Staff_CustomFields_GetAll", new SqlParameter[0]);
+                        foreach (DataRow r in customDt.Rows)
+                        {
+                            int sId = Convert.ToInt32(r["StaffID"]);
+                            if (!customVals.ContainsKey(sId))
+                                customVals[sId] = new List<StudentCustomFieldValueViewModel>();
+
+                            customVals[sId].Add(new StudentCustomFieldValueViewModel
+                            {
+                                FieldID = Convert.ToInt32(r["FieldID"]),
+                                FieldName = r["FieldName"]?.ToString() ?? "",
+                                FieldValue = r["FieldValue"]?.ToString() ?? ""
+                            });
+                        }
+                    }
+                    catch { }
+
                     foreach (DataRow row in dt.Rows)
                     {
                         var staff = MapStaff(row);
+                        
+                        // Map custom field values
+                        if (customVals.TryGetValue(staff.StaffID, out var vals))
+                        {
+                            staff.CustomFieldValues = vals;
+                        }
                         
                         // Populate DisplayRoles using UserService as requested
                         if (staff.UserID.HasValue && staff.UserID > 0)
@@ -525,6 +554,23 @@ namespace SchoolERP.Net.Services
                 catch (Exception) { /* Handle or log if needed */ }
             }
 
+            // Retrieve custom field values for Staff
+            try
+            {
+                var customP = new[] { new SqlParameter("@StaffID", id) };
+                var customDt = _db.ExecuteQuery("sp_HR_Staff_CustomFields_GetByStaff", customP);
+                foreach (DataRow r in customDt.Rows)
+                {
+                    staff.CustomFieldValues.Add(new StudentCustomFieldValueViewModel
+                    {
+                        FieldID = Convert.ToInt32(r["FieldID"]),
+                        FieldName = r["FieldName"]?.ToString() ?? "",
+                        FieldValue = r["FieldValue"]?.ToString() ?? ""
+                    });
+                }
+            }
+            catch { }
+
             return staff;
         }
 
@@ -551,6 +597,49 @@ namespace SchoolERP.Net.Services
         {
             try
             {
+                // Map from FieldValues dictionary to standard properties if present
+                if (req.FieldValues != null && req.FieldValues.Count > 0)
+                {
+                    var mapVal = new Func<string, string>(key => req.FieldValues.ContainsKey(key) ? req.FieldValues[key] : "");
+                    var mapInt = new Func<string, int?>(key => req.FieldValues.ContainsKey(key) && int.TryParse(req.FieldValues[key], out var val) ? val : null);
+                    var mapDecimal = new Func<string, decimal>(key => req.FieldValues.ContainsKey(key) && decimal.TryParse(req.FieldValues[key], out var val) ? val : 0);
+                    var mapDate = new Func<string, DateTime?>(key => req.FieldValues.ContainsKey(key) && DateTime.TryParse(req.FieldValues[key], out var val) ? val : null);
+
+                    if (string.IsNullOrEmpty(req.StaffCode)) req.StaffCode = mapVal("Staff Code") ?? mapVal("StaffCode") ?? "";
+                    if (string.IsNullOrEmpty(req.FirstName)) req.FirstName = mapVal("First Name");
+                    if (string.IsNullOrEmpty(req.LastName)) req.LastName = mapVal("Last Name");
+                    if (string.IsNullOrEmpty(req.FatherName)) req.FatherName = mapVal("Father Name");
+                    if (string.IsNullOrEmpty(req.MotherName)) req.MotherName = mapVal("Mother Name");
+                    if (string.IsNullOrEmpty(req.Email)) req.Email = mapVal("Email");
+                    if (string.IsNullOrEmpty(req.MobileNo)) req.MobileNo = mapVal("Phone") ?? mapVal("Mobile No");
+                    if (string.IsNullOrEmpty(req.EmergencyMobileNo)) req.EmergencyMobileNo = mapVal("Emergency Contact Number");
+                    if (req.DOB == null) req.DOB = mapDate("Date Of Birth");
+                    if (req.DOJ == null) req.DOJ = mapDate("Date Of Joining");
+                    if (string.IsNullOrEmpty(req.Gender)) req.Gender = mapVal("Gender");
+                    if (string.IsNullOrEmpty(req.MaritalStatus)) req.MaritalStatus = mapVal("Marital Status");
+                    if (string.IsNullOrEmpty(req.CurrentAddress)) req.CurrentAddress = mapVal("Current Address");
+                    if (string.IsNullOrEmpty(req.PermanentAddress)) req.PermanentAddress = mapVal("Permanent Address");
+                    if (req.DesignationID == null || req.DesignationID == 0) req.DesignationID = mapInt("Designation");
+                    if (req.DepartmentID == null || req.DepartmentID == 0) req.DepartmentID = mapInt("Department");
+                    if (string.IsNullOrEmpty(req.Qualification)) req.Qualification = mapVal("Qualification");
+                    if (string.IsNullOrEmpty(req.WorkExperience)) req.WorkExperience = mapVal("Work Experience");
+                    if (string.IsNullOrEmpty(req.Note)) req.Note = mapVal("Note");
+                    if (string.IsNullOrEmpty(req.EPFNo)) req.EPFNo = mapVal("EPF No.");
+                    if (req.BasicSalary == 0) req.BasicSalary = mapDecimal("Basic Salary");
+                    if (string.IsNullOrEmpty(req.ContractType)) req.ContractType = mapVal("Contract Type");
+                    if (string.IsNullOrEmpty(req.WorkShift)) req.WorkShift = mapVal("Work Shift");
+                    if (string.IsNullOrEmpty(req.WorkLocation)) req.WorkLocation = mapVal("Work Location");
+                    if (string.IsNullOrEmpty(req.AccountTitle)) req.AccountTitle = mapVal("Account Title");
+                    if (string.IsNullOrEmpty(req.BankAccountNo)) req.BankAccountNo = mapVal("Bank Account No");
+                    if (string.IsNullOrEmpty(req.BankName)) req.BankName = mapVal("Bank Name");
+                    if (string.IsNullOrEmpty(req.IFSCCode)) req.IFSCCode = mapVal("IFSC Code");
+                    if (string.IsNullOrEmpty(req.BankBranchName)) req.BankBranchName = mapVal("Bank Branch Name");
+                    if (string.IsNullOrEmpty(req.FacebookURL)) req.FacebookURL = mapVal("Facebook URL");
+                    if (string.IsNullOrEmpty(req.TwitterURL)) req.TwitterURL = mapVal("Twitter URL");
+                    if (string.IsNullOrEmpty(req.LinkedinURL)) req.LinkedinURL = mapVal("Linkedin URL");
+                    if (string.IsNullOrEmpty(req.InstagramURL)) req.InstagramURL = mapVal("Instagram URL");
+                }
+
                 // If companyId/sessionId is 0 (e.g. from global context), try to resolve from staff record for updates
                 if (req.StaffID > 0 && (companyId <= 0 || sessionId <= 0))
                 {
@@ -674,6 +763,44 @@ namespace SchoolERP.Net.Services
 
                     if (updatedCount > 0) msg += $" | {updatedCount} Quotas updated.";
                     if (!string.IsNullOrEmpty(quotaErrors)) msg += $" | Quota Errors: {quotaErrors}";
+
+                    // Save dynamic custom fields
+                    try
+                    {
+                        var allFields = _fieldService.GetAllFields(companyId, sessionId, belongsTo: "Staff");
+                        var customFieldsDt = new DataTable();
+                        customFieldsDt.Columns.Add("FIELDID", typeof(int));
+                        customFieldsDt.Columns.Add("FIELDVALUE", typeof(string));
+
+                        if (req.FieldValues != null)
+                        {
+                            foreach (var field in allFields.Where(f => !f.IsSystemField))
+                            {
+                                if (req.FieldValues.ContainsKey(field.FieldName))
+                                {
+                                    customFieldsDt.Rows.Add(field.FieldId, req.FieldValues[field.FieldName] ?? "");
+                                }
+                            }
+                        }
+
+                        if (customFieldsDt.Rows.Count > 0)
+                        {
+                            var customP = new[] {
+                                new SqlParameter("@StaffID", staffId),
+                                new SqlParameter("@UserID", userId),
+                                new SqlParameter("@CustomFields", SqlDbType.Structured)
+                                {
+                                    TypeName = "dbo.udt_CustomFields",
+                                    Value = customFieldsDt
+                                }
+                            };
+                            _db.ExecuteNonQuery("sp_HR_Staff_CustomFields_Save", customP);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        msg += $" | Custom Fields Error: {ex.Message}";
+                    }
                 }
 
                 return (success, msg);

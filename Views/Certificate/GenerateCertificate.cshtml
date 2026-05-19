@@ -16,29 +16,46 @@
 
 <div class="card shadow-tbl-outer mb-2">
     <div class="card-body">
-        <div class="row">
-            <div class="col-md-3">
-                <label class="form-label fw-semibold">Class</label>
-                <select class="form-select select2" id="genClassId" onchange="loadSectionsForGen(this.value)">
-                    <option value="">Select Class</option>
-                </select>
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="position-relative border d-flex align-items-center rounded-2 px-3 bg-white">
+                <i class="fas fa-search search-icon-input"></i>
+                <input type="text" class="form-control border-0 ps-2" id="txtSearchInput" style="min-width: 220px;" placeholder="Search students...">
             </div>
-            <div class="col-md-3">
-                <label class="form-label fw-semibold">Section</label>
-                <select class="form-select select2" id="genSectionId">
-                    <option value="">Select Section</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label fw-semibold">Certificate Template</label>
-                <select class="form-select select2" id="genCertificateId">
-                    <option value="">Select Template</option>
-                </select>
-            </div>
-            <div class="col-md-2 d-flex align-items-end">
-                <button class="btn btn-info w-100" onclick="searchStudentsForGen()">
-                    <i class="ti ti-search me-1"></i> Search Students
-                </button>
+            <div class="d-flex align-items-center flex-wrap gap-2 flex-shrink-0">
+                <div style="width: 200px;" class="position-relative">
+                    <select class="form-select" id="genCertificateId">
+                        <option value="">Select Template</option>
+                    </select>
+                    <div class="invalid-feedback position-absolute" style="top: 100%; left: 0;">Template is required.</div>
+                </div>
+                <div class="dropdown">
+                    <a href="#" class="btn btn-white border btn-lg" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                        <i class="ti ti-filter text-gray-5 me-1"></i>Filters
+                    </a>
+                    <div class="dropdown-menu dropdown-lg dropdown-menu-end filter-dropdown p-0">
+                        <div class="d-flex align-items-center justify-content-between border-bottom filter-header py-2 px-3">
+                            <h6 class="mb-0 fw-bold">Select Criteria</h6>
+                            <div class="d-flex align-items-center justify-content-end">
+                                <button type="button" class="btn text-primary fs-6 p-0 border-0 bg-transparent" onclick="searchStudentsForGen()">Apply Filter</button>
+                            </div>
+                        </div>
+                        <div class="filter-body pb-0 p-3">
+                            <div class="mb-3 position-relative">
+                                <label class="form-label mb-1 fw-semibold">Class <span class="text-danger">*</span></label>
+                                <select class="form-select form-control select2" id="genClassId" onchange="loadSectionsForGen(this.value)">
+                                    <option value="">Select Class</option>
+                                </select>
+                                <div class="invalid-feedback">Class is required.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label mb-1 fw-semibold">Section</label>
+                                <select class="form-select form-control select2" id="genSectionId">
+                                    <option value="">Select Section</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -54,14 +71,18 @@
                             <input type="checkbox" class="form-check-input" id="selectAllStudents" onchange="toggleAllStudentsForGen(this.checked)">
                         </th>
                         <th>Admission No</th>
-                        <th>Roll No</th>
                         <th>Student Name</th>
+                        <th>Class</th>
                         <th>Father Name</th>
+                        <th>Date Of Birth</th>
+                        <th>Gender</th>
+                        <th>Category</th>
+                        <th>Mobile Number</th>
                     </tr>
                 </thead>
                 <tbody id="genStudentList">
                     <tr>
-                        <td colspan="5" class="text-center py-5 text-muted">
+                        <td colspan="9" class="text-center py-5 text-muted">
                             <i class="ti ti-search fs-1 d-block mb-2"></i>
                             Please select filters and search to see students.
                         </td>
@@ -117,23 +138,54 @@
             });
         };
 
+        window.clearGenError = function (id) {
+            $('#' + id).removeClass('is-invalid');
+            if ($('#' + id).hasClass('select2-hidden-accessible')) {
+                $('#' + id).next('.select2-container').find('.select2-selection').removeClass('border-danger');
+                $('#' + id).siblings('.invalid-feedback').css('display', '');
+            }
+        };
+
         window.searchStudentsForGen = function () {
             var classId = $('#genClassId').val();
             var sectionId = $('#genSectionId').val();
-            if (!classId) { alert('Please select a class.'); return; }
+            if (!classId) { 
+                $('#genClassId').addClass('is-invalid');
+                if ($('#genClassId').hasClass('select2-hidden-accessible')) {
+                    $('#genClassId').next('.select2-container').find('.select2-selection').addClass('border-danger');
+                    $('#genClassId').siblings('.invalid-feedback').css('display', 'block');
+                }
+                return; 
+            }
 
-            $('#genStudentList').html('<tr><td colspan="5" class="text-center py-5"><span class="spinner-border spinner-border-sm me-2"></span>Searching students...</td></tr>');
+            $('#genStudentList').html('<tr><td colspan="9" class="text-center py-5"><span class="spinner-border spinner-border-sm me-2"></span>Searching students...</td></tr>');
             $.get('/api/StudentInformationApi/GetStudentList', { classId: classId, sectionId: sectionId }, function (resp) {
                 if (resp.success) {
                     var html = '';
                     if (resp.data.length === 0) {
-                        html = '<tr><td colspan="5" class="text-center py-5 text-muted">No students found.</td></tr>';
+                        html = '<tr><td colspan="9" class="text-center py-5 text-muted">No students found.</td></tr>';
                     } else {
                         resp.data.forEach(function(item) {
-                            html += '<tr><td><input type="checkbox" class="form-check-input gen-student-check" value="' + item.studentID + '"></td><td>' + (item.admissionNo || '') + '</td><td>' + (item.rollNo || '') + '</td><td>' + (item.fullName || '') + '</td><td>' + (item.fatherName || '') + '</td></tr>';
+                            var dob = item.dob ? new Date(item.dob).toLocaleDateString('en-GB').replace(/\//g, '-') : '-';
+                            var cls = (item.className || '') + (item.sectionName ? ' (' + item.sectionName + ')' : '');
+                            
+                            html += '<tr>' +
+                                '<td><input type="checkbox" class="form-check-input gen-student-check" value="' + item.studentID + '"></td>' +
+                                '<td>' + (item.admissionNo || '-') + '</td>' +
+                                '<td>' + (item.fullName || '-') + '</td>' +
+                                '<td>' + (cls || '-') + '</td>' +
+                                '<td>' + (item.fatherName || '-') + '</td>' +
+                                '<td>' + dob + '</td>' +
+                                '<td>' + (item.gender || '-') + '</td>' +
+                                '<td>' + (item.categoryName || '-') + '</td>' +
+                                '<td>' + (item.mobileNo || '-') + '</td>' +
+                                '</tr>';
                         });
                     }
                     $('#genStudentList').html(html);
+                    
+                    // Close the dropdown programmatically
+                    $('.dropdown-menu').removeClass('show');
                 }
             });
         };
@@ -142,7 +194,10 @@
 
         window.generateSelectedCertificates = async function () {
             var certId = $('#genCertificateId').val();
-            if (!certId) { alert('Please select a template.'); return; }
+            if (!certId) { 
+                $('#genCertificateId').addClass('is-invalid');
+                return; 
+            }
             var sIds = [];
             $('.gen-student-check:checked').each(function() { sIds.push($(this).val()); });
             if (sIds.length === 0) { alert('Please select at least one student.'); return; }
@@ -242,6 +297,21 @@
             }
             loadClassesForGen();
             loadTemplatesForGen();
+
+            // Bind error clearing
+            $('#genClassId').on('change', function() { clearGenError('genClassId'); });
+            $('#genCertificateId').on('change', function() { clearGenError('genCertificateId'); });
+
+            // Client-side search for the search box
+            $('#txtSearchInput').on('keyup', function() {
+                var q = $(this).val().toLowerCase();
+                $('#genStudentList tr').each(function() {
+                    // Skip the empty/loading messages if any
+                    if($(this).find('.text-muted, .spinner-border').length > 0) return;
+                    var text = $(this).text().toLowerCase();
+                    $(this).toggle(text.indexOf(q) > -1);
+                });
+            });
         });
     </script>
 }

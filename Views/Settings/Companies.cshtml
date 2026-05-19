@@ -302,9 +302,10 @@
                 </div>
             </div>
             <div class="modal-body p-4">
-                    @* Local alert div removed in favor of global toast system *@
-                    <form id="companyForm">
-                        <input type="hidden" id="txtCompanyId" value="0" />
+                <div id="companyModalNotice" class="alert alert-warning py-2 small d-none mb-3" role="alert"></div>
+                <form id="companyForm">
+                    <input type="hidden" id="txtCompanyId" value="0" />
+                    <input type="hidden" id="txtSessionId" value="@(Model.Sessions.FirstOrDefault(s => s.IsActive)?.SessionId ?? 0)" />
                     
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -949,6 +950,7 @@
         $('#companyForm')[0].reset();
         $('#companyForm .select2').trigger('change');
         $('#txtCompanyId').val(0);
+        $('#txtSessionId').val('@(Model.Sessions.FirstOrDefault(s => s.IsActive)?.SessionId ?? 0)');
         $('#modalTitle').text('Add New Company');
         companyModal.show();
     }
@@ -973,7 +975,7 @@
                 $('#txtAddress').val(data.address);
                 $('#txtPhone').val(data.phone);
                 $('#txtEmail').val(data.email);
-                //$('#ddlSession').val(data.sessionId);
+                $('#txtSessionId').val(data.sessionId);
                 $('#ddlCurrency').val(data.currencyId).trigger('change');
                 $('#ddlStartMonth').val(data.sessionStartMonth).trigger('change');
                 $('#ddlDateFormat').val(data.dateFormat).trigger('change');
@@ -1007,7 +1009,7 @@
 
         const schoolName = $('#txtSchoolName').val().trim();
         const schoolCode = $('#txtSchoolCode').val().trim();
-        const sessionId = parseInt($('#ddlSession').val());
+        const sessionId = parseInt($('#txtSessionId').val()) || 0;
         const currencyId = parseInt($('#ddlCurrency').val());
         const phone = $('#txtPhone').val().trim();
         const email = $('#txtEmail').val().trim();
@@ -1044,7 +1046,7 @@
             address: $('#txtAddress').val(),
             phone: $('#txtPhone').val(),
             email: $('#txtEmail').val(),
-            // sessionId: sessionId,
+            sessionId: sessionId,
             currencyId: currencyId,
             sessionStartMonth: $('#ddlStartMonth').val(),
             dateFormat: $('#ddlDateFormat').val(),
@@ -1053,6 +1055,12 @@
             currencyFormat: $('#ddlCurrencyFormat').val(),
             isActive: $('#chkIsActive').is(':checked')
         };
+
+        const btn = document.getElementById('btnSave');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving…';
+        }
 
         try {
             const response = await fetch('/Settings/SaveCompany', {
@@ -1065,10 +1073,18 @@
                 location.reload();
             } else {
                 IV.setNotice('companyModalNotice', result.message || 'Error saving company');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="ti ti-cloud me-1"></i> Save';
+                }
             }
         } catch (error) {
             console.error('Error:', error);
             showToast('An unexpected error occurred', 'error');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="ti ti-cloud me-1"></i> Save';
+            }
         }
     }
 

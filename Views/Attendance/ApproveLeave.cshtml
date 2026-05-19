@@ -132,7 +132,7 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title">Add/Edit Leave</h5>
+                <h5 class="modal-title" id="modalTitle">Add Leave Request</h5>
                 <div>
                     <button class="btn btn-success" id="btnSaveLeave"><i class="ti ti-cloud me-1"></i> Save</button>
                     <button class="btn btn-danger" data-bs-dismiss="modal"><i class="ti ti-x me-1"></i> Close</button>
@@ -284,6 +284,7 @@
         }
 
         function resetForm() {
+            $('#modalTitle').text('Add Leave Request');
             $('#leaveAppId').val(0);
             $('#leaveForm')[0].reset();
             $('.select2-modal').val('').trigger('change');
@@ -489,6 +490,7 @@
             const rowData = $(`#row-${id}`).data('leave-info');
             if (!rowData) return;
 
+            $('#modalTitle').text('Edit Leave Request');
             $('#leaveAppId').val(rowData.leaveAppID);
             $('#reason').val(rowData.reason);
             $('#applyDate').val(new Date(rowData.applyDate).toISOString().split('T')[0]);
@@ -581,12 +583,12 @@
     </script>
 
     <script>
-       
-        document.getElementById('tableSearch').addEventListener('input', function () {
-            const q = this.value.toLowerCase();
-            document.querySelectorAll('#tblLeave tbody tr').forEach(row => {
-                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+        $("#txtSearchInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#leaveTableBody tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
             });
+            renderFilterBadges();
         });
     </script>
 }

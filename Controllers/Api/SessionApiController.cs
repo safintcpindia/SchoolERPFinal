@@ -17,15 +17,18 @@ namespace SchoolERP.Net.Controllers.Api
     {
         private readonly ISessionService _sessionService;
         private readonly IUserMenuPermissionService _menuPerm;
+        private readonly ICompanyService _companySvc;
 
         private const string MenuPath = "/Settings";
 
-        public SessionApiController(ISessionService sessionService, IUserMenuPermissionService menuPerm)
+        public SessionApiController(ISessionService sessionService, IUserMenuPermissionService menuPerm, ICompanyService companySvc)
         {
             _sessionService = sessionService;
+            _companySvc = companySvc;
             _menuPerm = menuPerm;
         }
-
+        private int UserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "1");
+        private int CompanyId => _companySvc.GetUserCurrentCompany(UserId) ?? 0;
         /// <summary>
         /// Gets the full list of all academic sessions defined in the system.
         /// </summary>
@@ -62,7 +65,7 @@ namespace SchoolERP.Net.Controllers.Api
             if (!isCreate && !_menuPerm.Has(User, MenuPath, "Edit"))
                 return Ok(new { success = false, message = "You do not have permission to edit sessions." });
 
-            var (success, message) = _sessionService.UpsertSession(request, userId);
+            var (success, message) = _sessionService.UpsertSession(request, userId, CompanyId);
             return Ok(new { success, message });
         }
 

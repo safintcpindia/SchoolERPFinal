@@ -178,6 +178,10 @@
         </div>
         <div id="list-view-container" class="card shadow-tbl @(Model.ViewType == "list" ? "" : "d-none")">
             <div class="card-body">
+                @{
+                    var activeCustomFieldsOnTable = Model.CustomFields?.Where(f => f.IsActive && f.OnTable).OrderBy(f => f.DisplayOrder).ToList() ?? new List<FieldModel>();
+                    int colSpanCount = 7 + activeCustomFieldsOnTable.Count;
+                }
                 <div class="table-responsive">
                     <table class="table mb-0">
                         <thead>
@@ -189,6 +193,10 @@
                                 <th>Department</th>
                                 <th>Designation</th>
                                 <th>Mobile</th>
+                                @foreach (var field in activeCustomFieldsOnTable)
+                                {
+                                    <th>@field.FieldName</th>
+                                }
                             </tr>
                         </thead>
                         <tbody id="list-tbody">
@@ -216,11 +224,16 @@
                                     <td>@(s.DepartmentName ?? "N/A")</td>
                                     <td>@(s.DesignationName ?? "N/A")</td>
                                     <td>@(s.MobileNo ?? "N/A")</td>
+                                    @foreach (var field in activeCustomFieldsOnTable)
+                                    {
+                                        var val = s.CustomFieldValues?.FirstOrDefault(v => v.FieldID == field.FieldId)?.FieldValue ?? "";
+                                        <td>@val</td>
+                                    }
                                 </tr>
                             }
                             @if (!Model.StaffList.Any())
                             {
-                                <tr><td colspan="7" class="text-center py-4 text-muted">No staff records found.</td></tr>
+                                <tr><td colspan="@colSpanCount" class="text-center py-4 text-muted">No staff records found.</td></tr>
                             }
                         </tbody>
                     </table>

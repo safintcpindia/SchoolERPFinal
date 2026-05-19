@@ -108,20 +108,24 @@ namespace SchoolERP.Net.Services
                 new SqlParameter("@SessionId", sessionId)
             };
             var dt = _db.ExecuteQuery("sp_Settings_IDAutoGen_Get", p);
+            if (dt == null || dt.Rows.Count == 0 || !dt.Columns.Contains("ConfigID"))
+            {
+                return list;
+            }
             foreach (DataRow row in dt.Rows)
             {
                 list.Add(new IDAutoGenSettings
                 {
                     ConfigID = Convert.ToInt32(row["ConfigID"]),
-                    EntityType = row["EntityType"].ToString()!,
-                    IsEnabled = Convert.ToBoolean(row["IsEnabled"]),
-                    Prefix = row["Prefix"].ToString(),
-                    DigitCount = Convert.ToInt32(row["DigitCount"]),
-                    StartNo = Convert.ToInt32(row["StartNo"]),
-                    FieldsToInclude = row["FieldsToInclude"].ToString(),
-                    CompanyID = Convert.ToInt32(row["CompanyId"]),
-                    SessionID = Convert.ToInt32(row["SessionId"]),
-                    UpdatedAt = row["ModifiedOn"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(row["ModifiedOn"])
+                    EntityType = row["EntityType"]?.ToString() ?? string.Empty,
+                    IsEnabled = row["IsEnabled"] != DBNull.Value && Convert.ToBoolean(row["IsEnabled"]),
+                    Prefix = row["Prefix"]?.ToString() ?? string.Empty,
+                    DigitCount = row["DigitCount"] != DBNull.Value ? Convert.ToInt32(row["DigitCount"]) : 0,
+                    StartNo = row["StartNo"] != DBNull.Value ? Convert.ToInt32(row["StartNo"]) : 0,
+                    FieldsToInclude = row["FieldsToInclude"]?.ToString() ?? string.Empty,
+                    CompanyID = row.Table.Columns.Contains("CompanyId") && row["CompanyId"] != DBNull.Value ? Convert.ToInt32(row["CompanyId"]) : companyId,
+                    SessionID = row.Table.Columns.Contains("SessionId") && row["SessionId"] != DBNull.Value ? Convert.ToInt32(row["SessionId"]) : sessionId,
+                    UpdatedAt = row.Table.Columns.Contains("ModifiedOn") && row["ModifiedOn"] != DBNull.Value ? Convert.ToDateTime(row["ModifiedOn"]) : (DateTime?)null
                 });
             }
             return list;

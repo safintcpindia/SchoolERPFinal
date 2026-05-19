@@ -549,6 +549,28 @@ namespace SchoolERP.Net.Services
             return false;
         }
 
+        /// <summary>
+        /// Updates a user's password.
+        /// </summary>
+        public (int Result, string Message) ChangePassword(int userId, string password, int modifiedBy)
+        {
+            var parameters = new[]
+            {
+                new SqlParameter("@UserID", userId),
+                new SqlParameter("@PasswordPlain", password),
+                new SqlParameter("@ModifiedBy", modifiedBy)
+            };
+            DataTable dt = _sqlHelper.ExecuteQuery("sp_Users_UpdatePassword", parameters);
+            if (dt.Rows.Count > 0)
+            {
+                int result = Convert.ToInt32(dt.Rows[0]["Result"]);
+                string message = dt.Rows[0]["Message"]?.ToString() ?? "";
+                return (result, message);
+            }
+            return (-99, "Unknown error occurred.");
+        }
+
+
         private static string? FindColumnName(DataTable table, params string[] expectedNames)
         {
             foreach (DataColumn col in table.Columns)

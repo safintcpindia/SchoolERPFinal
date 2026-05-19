@@ -1883,6 +1883,22 @@
   },
   {
     "ContainingType": "SchoolERP.Net.Controllers.Api.HumanResourceApiController",
+    "Method": "ChangeStaffPassword",
+    "RelativePath": "api/HumanResourceApi/ChangeStaffPassword",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "req",
+        "Type": "SchoolERP.Net.Models.HRStaffChangePasswordRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SchoolERP.Net.Controllers.Api.HumanResourceApiController",
     "Method": "DeleteApplyLeave",
     "RelativePath": "api/HumanResourceApi/DeleteApplyLeave/{id}",
     "HttpMethod": "POST",
@@ -2670,6 +2686,22 @@
         "Name": "id",
         "Type": "System.Int32",
         "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SchoolERP.Net.Controllers.Api.MasterMenuApiController",
+    "Method": "Delete",
+    "RelativePath": "api/MasterMenuApi/delete",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "menuId",
+        "Type": "System.Int32",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []

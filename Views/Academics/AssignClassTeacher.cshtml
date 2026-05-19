@@ -100,6 +100,8 @@
                 </div>
             </div>
             <div class="modal-body">
+                <input type="hidden" id="txtOriginalClassId" value="0">
+                <input type="hidden" id="txtOriginalSectionId" value="0">
                 <div class="row row-gap-3">
                     <div class="col-md-6">
                         <label class="form-label">Class <span class="text-danger">*</span></label>
@@ -169,6 +171,8 @@
 
         function openAddModal() {
             $('#modalTitle').text('Assign Class Teacher');
+            $('#txtOriginalClassId').val('0');
+            $('#txtOriginalSectionId').val('0');
             $('#modalClassID').val('').prop('disabled', false);
             $('#modalSectionID').empty().append('<option value="">Select</option>').prop('disabled', false);
             teacherChoices.removeActiveItems();
@@ -200,7 +204,9 @@
             const staffIds = selectedRow.data("staff-ids");
 
             $('#modalTitle').text('Edit Class Teacher Assignment');
-            $('#modalClassID').val(classId).prop('disabled', true);
+            $('#txtOriginalClassId').val(classId);
+            $('#txtOriginalSectionId').val(sectionId);
+            $('#modalClassID').val(classId).prop('disabled', false);
             
             $.get('/Academics/GetSectionsByClass/' + classId, function (res) {
                 if (res.success) {
@@ -209,7 +215,7 @@
                     res.data.forEach(s => {
                         sectionSelect.append(`<option value="${s.sectionID}">${s.sectionName}</option>`);
                     });
-                    sectionSelect.val(sectionId).prop('disabled', true);
+                    sectionSelect.val(sectionId).prop('disabled', false);
                     
                     teacherChoices.removeActiveItems();
                     teacherChoices.setChoiceByValue(staffIds.map(String));
@@ -224,7 +230,8 @@
             const sectionId = $('#modalSectionID').val();
             const staffIds = teacherChoices.getValue(true);
 
-            console.log("Saving Assignment - Class:", classId, "Section:", sectionId, "Staff:", staffIds);
+            const originalClassId = parseInt($('#txtOriginalClassId').val());
+            const originalSectionId = parseInt($('#txtOriginalSectionId').val());
 
             if (!classId || !sectionId || !staffIds || staffIds.length === 0) {
                 alert('Please fill all required fields (Class, Section, and at least one Teacher).');
@@ -237,19 +244,38 @@
                 StaffIDs: staffIds.map(Number)
             };
 
-            $.ajax({
-                url: '/Academics/SaveClassTeacher',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: function (res) {
-                    if (res.success) {
-                        location.reload();
-                    } else {
-                        alert(res.message);
+            const performSave = () => {
+                $.ajax({
+                    url: '/Academics/SaveClassTeacher',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (res) {
+                        if (res.success) {
+                            location.reload();
+                        } else {
+                            alert(res.message);
+                        }
                     }
-                }
-            });
+                });
+            };
+
+            // If Class or Section changed, delete the old assignment first
+            if (originalClassId > 0 && originalSectionId > 0 && (originalClassId !== parseInt(classId) || originalSectionId !== parseInt(sectionId))) {
+                $.ajax({
+                    url: `/Academics/DeleteClassTeacherByClassSection?classId=${originalClassId}&sectionId=${originalSectionId}`,
+                    type: 'POST',
+                    success: function (res) {
+                        if (res.success) {
+                            performSave();
+                        } else {
+                            alert('Failed to update old assignment: ' + res.message);
+                        }
+                    }
+                });
+            } else {
+                performSave();
+            }
         }
 
         function deleteSelected() {
@@ -259,17 +285,9 @@
                 const classId = selectedRow.data("class-id");
                 const sectionId = selectedRow.data("section-id");
                 
-                const data = {
-                    ClassID: classId,
-                    SectionID: sectionId,
-                    StaffIDs: [] 
-                };
-
                 $.ajax({
-                    url: '/Academics/SaveClassTeacher',
+                    url: `/Academics/DeleteClassTeacherByClassSection?classId=${classId}&sectionId=${sectionId}`,
                     type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(data),
                     success: function (res) {
                         if (res.success) {
                             location.reload();

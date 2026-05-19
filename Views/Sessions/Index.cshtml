@@ -23,9 +23,15 @@
     var canAdd = PermHelper.HasPermissionByUrl("/Sessions", "Add");
     var canEdit = PermHelper.HasPermissionByUrl("/Sessions", "Edit");
     var canDelete = PermHelper.HasPermissionByUrl("/Sessions", "Delete");
+    var canPrint = PermHelper.HasPermissionByUrl("/Sessions", "Print");
+    var canExport = PermHelper.HasPermissionByUrl("/Sessions", "Export");
 }
 
 @* Local alert div removed in favor of global toast system *@
+
+<style>
+    .dt-buttons { display: none !important; }
+</style>
 
 <div class="d-flex align-items-sm-center justify-content-between flex-wrap gap-1 mb-2">
     <div>
@@ -49,6 +55,26 @@
             <button id="btnDelete" class="btn btn-danger" disabled onclick="deleteSelected()">
                 <i class="ti ti-trash me-1"></i>Delete
             </button>
+        }
+        @if (canPrint)
+        {
+            <button class="btn btn-dark d-inline-flex align-items-center shadow-sm" onclick="triggerExport('print')">
+                <i class="ti ti-printer me-1"></i> Print
+            </button>
+        }
+        @if (canExport)
+        {
+            <div class="dropdown d-inline-block">
+                <button class="btn btn-secondary dropdown-toggle d-inline-flex align-items-center shadow-sm" type="button" data-bs-toggle="dropdown">
+                    <i class="ti ti-download me-1"></i> Export
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport('copy')"><i class="ti ti-copy me-2"></i>Copy</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport('csv')"><i class="ti ti-file-text me-2"></i>CSV</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport('excel')"><i class="ti ti-file-spreadsheet me-2"></i>Excel</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport('pdf')"><i class="ti ti-file-description me-2"></i>PDF</a></li>
+                </ul>
+            </div>
         }
     </div>
 </div>
@@ -114,11 +140,11 @@
                 </div>
             </div>
             <div class="modal-body p-3">
-                @* Local alert div removed in favor of global toast system *@
+                <div id="sessionModalNotice" class="alert alert-warning py-2 small d-none mb-3" role="alert"></div>
                 <form id="itemForm">
                     <input type="hidden" id="txtItemId" value="0">
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Session Title</label>
+                        <label class="form-label fw-semibold">Session Title <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="txtSessionTitle" placeholder="e.g. 2024-25" autocomplete="off">
                         <div class="invalid-feedback" id="errTxtSessionTitle"></div>
                     </div>
@@ -245,6 +271,10 @@
                 isActive: document.getElementById('isActive').checked
             };
 
+            const btn = document.getElementById('btnSave');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving…';
+
             try {
                 const resp = await fetch('/Sessions/Save', {
                     method: 'POST',
@@ -252,11 +282,18 @@
                     body: JSON.stringify(data)
                 });
                 const res = await resp.json();
-                if (res.success) location.reload();
-                else IV.setNotice('sessionModalNotice', res.message || 'Save failed.');
+                if (res.success) {
+                    location.reload();
+                } else {
+                    IV.setNotice('sessionModalNotice', res.message || 'Save failed.');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="ti ti-cloud me-1"></i>Save';
+                }
             } catch (err) {
                 console.error(err);
                 IV.setNotice('sessionModalNotice', 'Could not save session.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="ti ti-cloud me-1"></i>Save';
             }
         }
 
@@ -281,6 +318,36 @@
                 IV.setNotice('sessionPageNotice', 'Could not update status.');
                 location.reload();
             }
+        }
+
+        let exportTable;
+        $(document).ready(function () {
+            if ($.fn.DataTable.isDataTable('#sessionsTable')) {
+                $('#sessionsTable').DataTable().destroy();
+            }
+            exportTable = $('#sessionsTable').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    { extend: 'copy', exportOptions: { columns: [1, 3], rows: ':visible' } },
+                    { extend: 'csv', exportOptions: { columns: [1, 3], rows: ':visible' } },
+                    { extend: 'excel', exportOptions: { columns: [1, 3], rows: ':visible' } },
+                    { extend: 'pdf', exportOptions: { columns: [1, 3], rows: ':visible' } },
+                    { extend: 'print', exportOptions: { columns: [1, 3], rows: ':visible' } }
+                ],
+                searching: false,
+                paging: false,
+                info: false,
+                ordering: false
+            });
+        });
+
+        function triggerExport(type) {
+            if (!exportTable) return;
+            if (type === 'copy') exportTable.button('.buttons-copy').trigger();
+            else if (type === 'csv') exportTable.button('.buttons-csv').trigger();
+            else if (type === 'excel') exportTable.button('.buttons-excel').trigger();
+            else if (type === 'pdf') exportTable.button('.buttons-pdf').trigger();
+            else if (type === 'print') exportTable.button('.buttons-print').trigger();
         }
     </script>
 }

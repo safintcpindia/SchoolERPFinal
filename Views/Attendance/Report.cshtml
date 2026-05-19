@@ -147,6 +147,23 @@
             $('#filter-dropdown').on('click', function (e) {
                 e.stopPropagation();
             });
+
+            // Bind filter button click
+            $('#btnFilterSearch').on('click', function (e) {
+                e.preventDefault();
+                loadReport();
+            });
+
+            // Bind date change
+            $('#attendanceDate').on('change', function () {
+                const classId = $('#classSelect').val();
+                const sectionId = $('#sectionSelect').val();
+                if (classId && sectionId) {
+                    loadReport();
+                } else {
+                    renderFilterBadges();
+                }
+            });
         });
 
         // --- Filter Badges Logic ---

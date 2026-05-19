@@ -99,5 +99,18 @@ namespace SchoolERP.Net.Controllers
             var response = await _menuClient.UpdateMenuOrderAsync(orders);
             return Json(new { success = response.Success, message = response.Message });
         }
+
+        /// <summary>
+        /// Deletes a menu item.
+        /// </summary>
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (!_menuPerm.Has(User, MenuPath, "Delete"))
+                return Json(new { success = false, message = "You do not have permission to delete menus." });
+
+            var response = await _menuClient.DeleteMenuAsync(id);
+            return Json(new { success = response.Success, message = response.Message });
+        }
     }
 }

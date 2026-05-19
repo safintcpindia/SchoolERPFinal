@@ -15,6 +15,14 @@
     var canAdd = PermHelper.HasPermissionByUrl("/Transport/Vehicles", "Add");
     var canEdit = PermHelper.HasPermissionByUrl("/Transport/Vehicles", "Edit");
     var canDelete = PermHelper.HasPermissionByUrl("/Transport/Vehicles", "Delete");
+    var canPrint = PermHelper.HasPermissionByUrl("/Transport/Vehicles", "Print");
+    var canExport = PermHelper.HasPermissionByUrl("/Transport/Vehicles", "Export");
+}
+
+@section Styles {
+    <style>
+        .dt-buttons { display: none !important; }
+    </style>
 }
 
 <div class="d-flex align-items-sm-center justify-content-between flex-wrap gap-2 mb-2">
@@ -39,6 +47,26 @@
             <button id="btnDelete" class="btn btn-danger" disabled onclick="deleteSelected()">
                 <i class="ti ti-trash me-1"></i> Delete
             </button>
+        }
+        @if (canPrint)
+        {
+            <button class="btn btn-secondary d-inline-flex align-items-center" onclick="triggerExport(4)">
+                <i class="ti ti-printer me-1"></i>Print
+            </button>
+        }
+        @if (canExport)
+        {
+            <div class="dropdown d-inline-flex">
+                <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="ti ti-download me-1"></i>Export
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(0)"><i class="ti ti-copy me-1"></i>Copy</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(1)"><i class="ti ti-file-text me-1"></i>CSV</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(2)"><i class="ti ti-file-spreadsheet me-1"></i>Excel</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(3)"><i class="ti ti-file-pdf me-1"></i>PDF</a></li>
+                </ul>
+            </div>
         }
     </div>
 </div>
@@ -149,7 +177,8 @@
                             <div class="row row-gap-3">
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Vehicle Number <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="txtVehicleNumber" required maxlength="50">
+                                    <input type="text" class="form-control" id="txtVehicleNumber" required maxlength="50" oninput="clearError('txtVehicleNumber')">
+                                    <div class="invalid-feedback">Vehicle Number is required</div>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Model</label>
@@ -187,7 +216,8 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Driver Contact</label>
-                                    <input type="text" class="form-control" id="txtDriverContact" maxlength="20">
+                                    <input type="text" class="form-control" id="txtDriverContact" maxlength="10" pattern="\d{10}" title="Driver contact must be exactly 10 digits" oninput="this.value = this.value.replace(/[^0-9]/g, ''); clearError('txtDriverContact');">
+                                    <div class="invalid-feedback">Driver contact must be exactly 10 digits</div>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Driver License No</label>
@@ -217,6 +247,29 @@
 
 @section Scripts {
 <script>
+    function triggerExport(index) {
+        if ($.fn.DataTable.isDataTable('#tblVehicles')) {
+            const table = $('#tblVehicles').DataTable();
+            table.button(index).trigger();
+        }
+    }
+
+    $(document).ready(function () {
+        $('#tblVehicles').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                { extend: 'copy', exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
+                { extend: 'csv', exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
+                { extend: 'excel', exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
+                { extend: 'pdf', exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
+                { extend: 'print', exportOptions: { columns: [1, 2, 3, 4, 5, 6] } }
+            ],
+            searching: false,
+            paging: false,
+            info: false
+        });
+    });
+
     let selectedId = 0;
     const canEdit = @canEdit.ToString().ToLower();
     const canDelete = @canDelete.ToString().ToLower();
@@ -254,7 +307,13 @@
         }
     }
 
+    function clearError(id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('is-invalid');
+    }
+
     function openAddModal() {
+        document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
         document.getElementById('modalTitle').textContent = 'Add Vehicle';
         document.getElementById('hdnVehicleID').value = 0;
         document.getElementById('entryForm').reset();
@@ -270,6 +329,7 @@
             .then(res => {
                 if (!res.success) { showToast(res.message, 'danger'); return; }
                 const d = res.data;
+                document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
                 document.getElementById('modalTitle').textContent = 'Edit Vehicle';
                 document.getElementById('hdnVehicleID').value = d.vehicleID;
                 document.getElementById('txtVehicleNumber').value = d.vehicleNumber;
@@ -295,8 +355,20 @@
     }
 
     async function saveRecord() {
-        const form = document.getElementById('entryForm');
-        if (!form.checkValidity()) { form.reportValidity(); return; }
+        let isValid = true;
+        const vNumber = document.getElementById('txtVehicleNumber').value.trim();
+        const contact = document.getElementById('txtDriverContact').value.trim();
+
+        if (!vNumber) {
+            document.getElementById('txtVehicleNumber').classList.add('is-invalid');
+            isValid = false;
+        }
+        if (contact && contact.length !== 10) {
+            document.getElementById('txtDriverContact').classList.add('is-invalid');
+            isValid = false;
+        }
+
+        if (!isValid) return;
 
         const formData = new FormData();
         formData.append('VehicleID', document.getElementById('hdnVehicleID').value);

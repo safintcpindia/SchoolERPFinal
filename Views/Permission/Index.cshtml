@@ -28,9 +28,15 @@
     var canAdd = PermHelper.HasPermissionByUrl("/Permission", "Add");
     var canEdit = PermHelper.HasPermissionByUrl("/Permission", "Edit");
     var canDelete = PermHelper.HasPermissionByUrl("/Permission", "Delete");
+    var canPrint = PermHelper.HasPermissionByUrl("/Permission", "Print");
+    var canExport = PermHelper.HasPermissionByUrl("/Permission", "Export");
 }
 
 @* Local alert div removed in favor of global toast system *@
+
+<style>
+    .dt-buttons { display: none !important; }
+</style>
 
 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
     <div>
@@ -47,6 +53,26 @@
         <button id="btnDelete" class="btn btn-danger shadow-sm" disabled onclick="deleteSelected()" asp-permission="Delete" asp-permission-url="/Permission">
             <i class="ti ti-trash me-1"></i>Delete
         </button>
+        @if (canPrint)
+        {
+            <button class="btn btn-dark d-inline-flex align-items-center shadow-sm" onclick="triggerExport('print')">
+                <i class="ti ti-printer me-1"></i> Print
+            </button>
+        }
+        @if (canExport)
+        {
+            <div class="dropdown d-inline-block">
+                <button class="btn btn-secondary dropdown-toggle d-inline-flex align-items-center shadow-sm" type="button" data-bs-toggle="dropdown">
+                    <i class="ti ti-download me-1"></i> Export
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport('copy')"><i class="ti ti-copy me-2"></i>Copy</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport('csv')"><i class="ti ti-file-text me-2"></i>CSV</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport('excel')"><i class="ti ti-file-spreadsheet me-2"></i>Excel</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport('pdf')"><i class="ti ti-file-description me-2"></i>PDF</a></li>
+                </ul>
+            </div>
+        }
     </div>
 </div>
 
@@ -347,6 +373,36 @@
                 IV.setNotice('permPageNotice', res.message || 'Could not update status.');
                 location.reload();
             }
+        }
+
+        let exportTable;
+        $(document).ready(function () {
+            if ($.fn.DataTable.isDataTable('#permissionsTable')) {
+                $('#permissionsTable').DataTable().destroy();
+            }
+            exportTable = $('#permissionsTable').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    { extend: 'copy', exportOptions: { columns: [1, 2, 4], rows: ':visible' } },
+                    { extend: 'csv', exportOptions: { columns: [1, 2, 4], rows: ':visible' } },
+                    { extend: 'excel', exportOptions: { columns: [1, 2, 4], rows: ':visible' } },
+                    { extend: 'pdf', exportOptions: { columns: [1, 2, 4], rows: ':visible' } },
+                    { extend: 'print', exportOptions: { columns: [1, 2, 4], rows: ':visible' } }
+                ],
+                searching: false,
+                paging: false,
+                info: false,
+                ordering: false
+            });
+        });
+
+        function triggerExport(type) {
+            if (!exportTable) return;
+            if (type === 'copy') exportTable.button('.buttons-copy').trigger();
+            else if (type === 'csv') exportTable.button('.buttons-csv').trigger();
+            else if (type === 'excel') exportTable.button('.buttons-excel').trigger();
+            else if (type === 'pdf') exportTable.button('.buttons-pdf').trigger();
+            else if (type === 'print') exportTable.button('.buttons-print').trigger();
         }
 
         document.getElementById('txtSearchInput')?.addEventListener('input', function () {

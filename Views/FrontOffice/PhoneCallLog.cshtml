@@ -132,7 +132,8 @@
                     <div class="row row-gap-3">
                         <div class="col-md-6">
                             <label class="form-label">Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="txtName" required>
+                            <input type="text" class="form-control" id="txtName">
+                            <div id="errName" class="invalid-feedback" style="display: none;">Name is required.</div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Phone</label>
@@ -141,7 +142,8 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Date <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" id="txtDate" required value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                            <input type="date" class="form-control" id="txtDate" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                            <div id="errDate" class="invalid-feedback" style="display: none;">Date is required.</div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Description</label>
@@ -156,12 +158,13 @@
                             <input type="text" class="form-control" id="txtCallDuration" placeholder="e.g. 5 mins">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Call Type</label>
+                            <label class="form-label">Call Type <span class="text-danger">*</span></label>
                             <select class="form-select" id="ddlCallType">
                                 <option value="">-- Select --</option>
                                 <option value="Incoming">Incoming</option>
                                 <option value="Outgoing">Outgoing</option>
                             </select>
+                            <div id="errCallType" class="invalid-feedback" style="display: none;">Call Type is required.</div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Note</label>
@@ -246,8 +249,59 @@
         InlineFormValidation.clearFieldError('txtPhone', 'errPhone');
         const isPhoneValid = InlineFormValidation.validateMobile('txtPhone', 'errPhone', false);
         
-        if (!form.checkValidity() || !isPhoneValid) { 
-            form.reportValidity(); 
+        // Name Validation
+        const txtName = document.getElementById('txtName');
+        let isNameValid = true;
+        if (!txtName.value.trim()) {
+            txtName.classList.add('is-invalid');
+            document.getElementById('errName').style.display = 'block';
+            isNameValid = false;
+        } else {
+            txtName.classList.remove('is-invalid');
+            document.getElementById('errName').style.display = 'none';
+        }
+        txtName.addEventListener('keyup', function() {
+            if(this.value.trim()) {
+                this.classList.remove('is-invalid');
+                document.getElementById('errName').style.display = 'none';
+            }
+        });
+
+        // Date Validation
+        const txtDate = document.getElementById('txtDate');
+        let isDateValid = true;
+        if (!txtDate.value) {
+            txtDate.classList.add('is-invalid');
+            document.getElementById('errDate').style.display = 'block';
+            isDateValid = false;
+        } else {
+            txtDate.classList.remove('is-invalid');
+            document.getElementById('errDate').style.display = 'none';
+        }
+        txtDate.addEventListener('change', function() {
+            if(this.value) {
+                this.classList.remove('is-invalid');
+                document.getElementById('errDate').style.display = 'none';
+            }
+        });
+
+        // Call Type Validation
+        const ddlCallType = document.getElementById('ddlCallType');
+        let isCallTypeValid = true;
+        if (!ddlCallType.value) {
+            ddlCallType.classList.add('is-invalid');
+            document.getElementById('errCallType').style.display = 'block';
+            isCallTypeValid = false;
+        } else {
+            ddlCallType.classList.remove('is-invalid');
+            document.getElementById('errCallType').style.display = 'none';
+        }
+        ddlCallType.addEventListener('change', function() {
+            this.classList.remove('is-invalid');
+            document.getElementById('errCallType').style.display = 'none';
+        });
+
+        if (!isNameValid || !isDateValid || !isPhoneValid || !isCallTypeValid) { 
             return; 
         }
 

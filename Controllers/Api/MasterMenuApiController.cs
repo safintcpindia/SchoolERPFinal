@@ -115,6 +115,25 @@ namespace SchoolERP.Net.Controllers.Api
             return BadRequest(ApiResponse<bool>.ErrorResponse(message));
         }
 
+        /// <summary>
+        /// Deletes a menu item using its unique ID number.
+        /// </summary>
+        [HttpPost("delete")]
+        public IActionResult Delete([FromQuery] int menuId)
+        {
+            int userId = GetCurrentUserId();
+            if (userId <= 0)
+                return Unauthorized(ApiResponse<bool>.ErrorResponse("User is not authenticated."));
+            string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+            var (result, message) = _menuService.DeleteMenu(menuId, userId, ipAddress);
+            
+            if (result > 0)
+                return Ok(ApiResponse<bool>.SuccessResponse(true, message));
+
+            return BadRequest(ApiResponse<bool>.ErrorResponse(message));
+        }
+
         private int GetCurrentUserId()
         {
             return GetClaimInt(ClaimTypes.NameIdentifier, GetClaimInt("UserId", 0));

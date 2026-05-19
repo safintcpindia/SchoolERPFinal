@@ -54,5 +54,13 @@ namespace SchoolERP.Net.Services.Clients
         {
             return await PostAsync<bool>("api/MasterMenuApi/update-order", orders);
         }
+
+        /// <summary>
+        /// Sends a request to the server to delete a specific menu item.
+        /// </summary>
+        public async Task<ApiResponse<bool>> DeleteMenuAsync(int id)
+        {
+            return await PostAsync<bool>($"api/MasterMenuApi/delete?menuId={id}", null);
+        }
     }
 }

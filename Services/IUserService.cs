@@ -52,5 +52,8 @@ namespace SchoolERP.Net.Services
 
         /// <summary>Checks if a username is already being used by someone else.</summary>
         bool IsUsernameUnique(string username, int userId);
+
+        /// <summary>Updates a user's password.</summary>
+        (int Result, string Message) ChangePassword(int userId, string password, int modifiedBy);
     }
 }

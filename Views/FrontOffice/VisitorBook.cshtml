@@ -119,9 +119,9 @@
                                     <td>@item.PurposeName</td>
                                     <td>
                                         @if (item.MeetingWith == "Student") {
-                                            <span class="badge bg-light rounded-pill fw-normal text-info">Student: @item.StudentName</span>
+                                            <span class="text-primary">Student: @item.StudentName</span>
                                         } else if (item.MeetingWith == "Staff") {
-                                            <span class="badge bg-light rounded-pill fw-normal text-warning">Staff: @item.StaffName</span>
+                                            <span class="text-primary">Staff: @item.StaffName</span>
                                         } else {
                                             <span class="text-muted">-</span>
                                         }
@@ -133,9 +133,9 @@
                                     <td>@item.Phone</td>
                                     <td>@item.Date.ToString("dd-MM-yyyy")</td>
                                     <td>
-                                        <span class="badge bg-success-light text-success">@item.InTime</span>
+                                        <span class="">@item.InTime</span> /
                                         @if(!string.IsNullOrEmpty(item.OutTime)) {
-                                            <span class="badge bg-danger-light text-danger">@item.OutTime</span>
+                                            <span class="">@item.OutTime</span>
                                         }
                                     </td>
                                     <td>
@@ -190,27 +190,20 @@
                     <div class="row row-gap-3">
                         <div class="col-md-6">
                             <label class="form-label">Purpose <span class="text-danger">*</span></label>
-                            <select class="form-select select2" id="ddlPurpose" name="PurposeID" required>
+                            <select class="form-select select2" id="ddlPurpose" name="PurposeID">
                                 <option value="">Select</option>
                                 @foreach(var p in Model.Purposes) { <option value="@p.PurposeID">@p.Name</option> }
                             </select>
+                            <div id="errPurpose" class="invalid-feedback" style="display: none;">Purpose is required.</div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label d-block">Meeting With</label>
-                            <div class="d-flex gap-3 mt-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="MeetingWith" id="mwStudent" value="Student" onclick="handleMeetingWith(this.value)">
-                                    <label class="form-check-label" for="mwStudent">Student</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="MeetingWith" id="mwStaff" value="Staff" onclick="handleMeetingWith(this.value)">
-                                    <label class="form-check-label" for="mwStaff">Staff</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="MeetingWith" id="mwNone" value="" checked onclick="handleMeetingWith(this.value)">
-                                    <label class="form-check-label" for="mwNone">None</label>
-                                </div>
-                            </div>
+                            <label class="form-label">Meeting With <span class="text-danger">*</span></label>
+                            <select class="form-select select2" id="ddlMeetingWith" name="MeetingWith" onchange="handleMeetingWith(this.value)">
+                                <option value="">Select</option>
+                                <option value="Student">Student</option>
+                                <option value="Staff">Staff</option>
+                            </select>
+                            <div id="errMeetingWith" class="invalid-feedback" style="display: none;">Meeting With is required.</div>
                         </div>
 
                         <!-- Student Selection Section -->
@@ -234,22 +227,24 @@
                                     <select class="form-select select2" id="ddlStudent" name="StudentID">
                                         <option value="">Select Student</option>
                                     </select>
+                                    <div id="errStudent" class="invalid-feedback" style="display: none;">Student is required.</div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Staff Selection Section -->
                         <div id="staffSelection" class="col-md-12 border rounded p-3 d-none bg-light">
                             <label class="form-label">Staff Member <span class="text-danger">*</span></label>
                             <select class="form-select select2" id="ddlStaff" name="StaffID">
                                 <option value="">Select Staff</option>
                                 @foreach(var s in Model.Staff) { <option value="@s.StaffID">@s.FirstName @s.LastName (@s.StaffCode)</option> }
                             </select>
+                            <div id="errStaff" class="invalid-feedback" style="display: none;">Staff Member is required.</div>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label">Visitor Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="txtName" name="Name" placeholder="Full Name" required>
+                            <input type="text" class="form-control" id="txtName" name="Name" placeholder="Full Name">
+                            <div id="errName" class="invalid-feedback" style="display: none;">Visitor Name is required.</div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Phone</label>
@@ -266,7 +261,8 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Date <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" id="txtDate" name="Date" required value="@System.DateTime.Now.ToString("yyyy-MM-dd")">
+                            <input type="date" class="form-control" id="txtDate" name="Date" value="@System.DateTime.Now.ToString("yyyy-MM-dd")">
+                            <div id="errDate" class="invalid-feedback" style="display: none;">Date is required.</div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">In Time</label>
@@ -318,6 +314,27 @@
                 dropdownParent: $('#visitorModal'),
                 width: '100%'
             });
+        });
+
+        // Clear validation errors on change/input
+        const clearError = (id, errId) => {
+            const el = document.getElementById(id);
+            if (el && el.value.trim()) {
+                el.classList.remove('is-invalid');
+                document.getElementById(errId).style.display = 'none';
+            }
+        };
+
+        $('#ddlPurpose, #ddlMeetingWith, #ddlStudent, #ddlStaff').on('change', function() {
+            clearError(this.id, 'err' + this.id.replace('ddl', ''));
+        });
+
+        $('#txtDate').on('change', function() {
+            clearError('txtDate', 'errDate');
+        });
+
+        $('#txtName').on('keyup', function() {
+            clearError('txtName', 'errName');
         });
     });
 
@@ -409,8 +426,8 @@
         document.getElementById('fileInfo').textContent = '';
         
         // Reset Meeting With
+        $('#ddlMeetingWith').val('').trigger('change');
         handleMeetingWith('');
-        document.getElementById('mwNone').checked = true;
 
         $('#ddlPurpose, #ddlClass, #ddlSection, #ddlStudent, #ddlStaff').val('').trigger('change');
         
@@ -438,10 +455,8 @@
         document.getElementById('fileInfo').textContent = d.fileName ? 'Current file: ' + d.fileName : '';
 
         // Handle Meeting With
-        const mw = d.meetingWith || '';
-        if (mw === 'Student') document.getElementById('mwStudent').checked = true;
-        else if (mw === 'Staff') document.getElementById('mwStaff').checked = true;
-        else document.getElementById('mwNone').checked = true;
+        const mw = (d.meetingWith === 'Student' || d.meetingWith === 'Staff') ? d.meetingWith : '';
+        $('#ddlMeetingWith').val(mw).trigger('change');
         handleMeetingWith(mw);
 
         if (mw === 'Student' && d.studentID) {
@@ -473,12 +488,33 @@
     function saveVisitor() {
         const form = document.getElementById('visitorForm');
         
-        // Reset and validate
+        // Reset and validate Phone
         InlineFormValidation.clearFieldError('txtPhone', 'errPhone');
         const isPhoneValid = InlineFormValidation.validateMobile('txtPhone', 'errPhone', false);
         
-        if (!form.checkValidity() || !isPhoneValid) { 
-            form.reportValidity(); 
+        let isValid = true;
+        const validateField = (id, errId) => {
+            const el = document.getElementById(id);
+            if (!el || !el.value.trim()) {
+                if (el) el.classList.add('is-invalid');
+                document.getElementById(errId).style.display = 'block';
+                isValid = false;
+            } else {
+                el.classList.remove('is-invalid');
+                document.getElementById(errId).style.display = 'none';
+            }
+        };
+
+        validateField('ddlPurpose', 'errPurpose');
+        validateField('ddlMeetingWith', 'errMeetingWith');
+        validateField('txtName', 'errName');
+        validateField('txtDate', 'errDate');
+
+        const mw = document.getElementById('ddlMeetingWith').value;
+        if (mw === 'Student') validateField('ddlStudent', 'errStudent');
+        if (mw === 'Staff') validateField('ddlStaff', 'errStaff');
+
+        if (!isValid || !isPhoneValid) { 
             return; 
         }
 

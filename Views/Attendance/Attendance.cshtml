@@ -181,6 +181,20 @@
                 loadAttendanceList();
             });
 
+            $('#attendanceDate').on('change', function () {
+                const classId = $('#classSelect').val();
+                const sectionId = $('#sectionSelect').val();
+                if (classId && sectionId) {
+                    loadAttendanceList();
+                } else {
+                    renderFilterBadges();
+                }
+            });
+
+            $('#txtSearch').on('keyup', function () {
+                filterAttendanceTable();
+            });
+
             $('.set-all').on('change', function () {
                 const status = $(this).data('status');
                 $(`input[type="radio"][value="${status}"]`).prop('checked', true);

@@ -11493,8 +11493,12 @@ Version: 1.0.0
 Author: Dreams Technologies
 Author URL: https://themeforest.net/user/dreamstechnologies
 */
-.filter-body .select2-container .select2-selection--single .select2-selection__clear{
-    display:none;
+
+.dropdown-toggle::after {
+    font-size: inherit !important;
+}
+.filter-body .select2-container .select2-selection--single .select2-selection__clear {
+    display: none;
 }
 .form-control.is-invalid, 
 .was-validated .form-control:invalid{

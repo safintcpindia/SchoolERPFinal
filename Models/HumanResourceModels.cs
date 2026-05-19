@@ -160,6 +160,8 @@ namespace SchoolERP.Net.Models
         public DateTime? ModifiedOn { get; set; }
         public List<HRStaffLeaveQuotaViewModel> LeaveQuotas { get; set; } = new();
         public List<FieldModel> SystemFields { get; set; } = new(); // NEW: For dynamic visibility
+        public List<FieldModel> CustomFields { get; set; } = new();
+        public List<StudentCustomFieldValueViewModel> CustomFieldValues { get; set; } = new();
     }
 
     public class HRStaffLeaveQuotaRequest
@@ -179,6 +181,7 @@ namespace SchoolERP.Net.Models
     {
         public int StaffID { get; set; }
         public int UserID { get; set; }
+        public Dictionary<string, string> FieldValues { get; set; } = new(StringComparer.OrdinalIgnoreCase);
         public string StaffCode { get; set; } = string.Empty;
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
@@ -255,6 +258,13 @@ namespace SchoolERP.Net.Models
         public List<int> CompanyIDs { get; set; } = new();
     }
 
+    public class HRStaffChangePasswordRequest
+    {
+        public int StaffID { get; set; }
+        public string NewPassword { get; set; } = string.Empty;
+    }
+
+
     public class HRStaffPageViewModel
     {
         public string NewStaffCode { get; set; } = string.Empty;
@@ -266,6 +276,7 @@ namespace SchoolERP.Net.Models
         public List<MstCompanyViewModel> Companies { get; set; } = new();
         public List<HRLeaveTypeViewModel> LeaveTypes { get; set; } = new();
         public List<FieldModel> SystemFields { get; set; } = new(); // NEW: For dynamic visibility
+        public List<FieldModel> CustomFields { get; set; } = new();
         public HRStaffViewModel? EditStaff { get; set; }
         public string ViewType { get; set; } = "list";
         public string? SearchTerm { get; set; }

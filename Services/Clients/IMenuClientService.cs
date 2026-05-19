@@ -34,5 +34,10 @@ namespace SchoolERP.Net.Services.Clients
         /// Sends a list of menu items with their new display order to the main system.
         /// </summary>
         Task<ApiResponse<bool>> UpdateMenuOrderAsync(List<MenuOrderRequest> orders);
+
+        /// <summary>
+        /// Deletes a menu item by ID.
+        /// </summary>
+        Task<ApiResponse<bool>> DeleteMenuAsync(int id);
     }
 }

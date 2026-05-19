@@ -164,6 +164,7 @@
 
             if (!classId && !search) {
                 $('#listBody').html('<tr><td colspan="8" class="text-center py-4 text-muted">Please select Class or enter Search term.</td></tr>');
+                renderFilterBadges();
                 return;
             }
 
@@ -264,17 +265,16 @@
             const el = document.getElementById(filterId);
             if (!el) return;
 
-            if (el.tagName === 'INPUT' && filterId === 'txtSearchInput') {
+            if (filterId === 'fClass') {
                 el.value = '';
+                $('#fSection').val('').trigger('change.select2');
+                $(el).trigger('change');
+            } else if (filterId === 'fSection') {
+                el.value = '';
+                $(el).trigger('change');
                 loadData();
-            } else {
+            } else if (filterId === 'txtSearchInput') {
                 el.value = '';
-                if (filterId === 'fClass') {
-                    $('#fSection').html('<option value="">All Sections</option>');
-                }
-                if (window.jQuery && jQuery(el).data('select2')) {
-                    jQuery(el).trigger('change.select2');
-                }
                 loadData();
             }
         }
@@ -282,10 +282,8 @@
         function resetAllFilters() {
             document.getElementById('txtSearchInput').value = '';
             document.getElementById('fClass').value = '';
-            document.getElementById('fSection').value = '';
-            
-            $('.select2').trigger('change.select2');
-            loadData();
+            $('#fSection').val('').trigger('change.select2');
+            $('#fClass').trigger('change');
         }
 
         function openCardModal(id, name) {

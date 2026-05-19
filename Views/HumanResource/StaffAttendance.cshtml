@@ -79,7 +79,7 @@
                 <div class="d-flex justify-content-between align-items-center gap-3">
                     <div>
                         <label for="" class="form-label">Attendance Date</label>
-                        <input type="date" class="form-control" id="mainDate" value="@DateTime.Now.ToString("yyyy-MM-dd")" onchange="syncDate(this, 'filterDate')">
+                        <input type="date" class="form-control" id="mainDate" value="@DateTime.Now.ToString("yyyy-MM-dd")" onchange="loadStaff()">
                     </div>
                     <div>
                         <label for="" class="form-label">Set attendance for all Staff as</label>
@@ -147,10 +147,6 @@
 
         renderFilterBadges();
     });
-
-    function syncDate(src, targetId) {
-        $(`#${targetId}`).val($(src).val());
-    }
 
     async function loadStaff() {
         const date = $('#mainDate').val();

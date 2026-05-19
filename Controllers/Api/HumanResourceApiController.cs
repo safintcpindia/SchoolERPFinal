@@ -21,18 +21,20 @@ namespace SchoolERP.Net.Controllers.Api
         private readonly ICompanyService _companySvc;
         private readonly ISessionService _sessionSvc;
         private readonly IUserMenuPermissionService _menuPerm;
+        private readonly IUserService _userService;
 
         private const string DesignationMenuPath = "/HumanResource/Designation";
         private const string DepartmentMenuPath = "/HumanResource/Department";
         private const string LeaveTypeMenuPath = "/HumanResource/LeaveType";
         private const string StaffMenuPath = "/HumanResource/Staffs";
 
-        public HumanResourceApiController(IHumanResourceService hrService, ICompanyService companySvc, ISessionService sessionSvc, IUserMenuPermissionService menuPerm)
+        public HumanResourceApiController(IHumanResourceService hrService, ICompanyService companySvc, ISessionService sessionSvc, IUserMenuPermissionService menuPerm, IUserService userService)
         {
             _hrService = hrService;
             _companySvc = companySvc;
             _sessionSvc = sessionSvc;
             _menuPerm = menuPerm;
+            _userService = userService;
         }
 
         private int GetUserId() => int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("UserId"), out var id) ? id : 0;
@@ -507,6 +509,33 @@ namespace SchoolERP.Net.Controllers.Api
             {
                 var result = _hrService.ToggleStaffStatus(req.StaffId, req.IsActive, GetUserId(), req.StatusDate);
                 return Ok(new { success = result.Success, message = result.Message });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { success = false, message = "Database Error: " + ex.Message });
+            }
+        }
+
+        [HttpPost("ChangeStaffPassword")]
+        public IActionResult ChangeStaffPassword([FromBody] HRStaffChangePasswordRequest req)
+        {
+            try
+            {
+                if (!_menuPerm.Has(User, StaffMenuPath, "Edit"))
+                    return Ok(new { success = false, message = "You do not have permission to edit staff details." });
+
+                if (req.StaffID <= 0 || string.IsNullOrEmpty(req.NewPassword))
+                    return Ok(new { success = false, message = "Invalid request details." });
+
+                var staff = _hrService.GetStaffByID(req.StaffID);
+                if (staff == null)
+                    return Ok(new { success = false, message = "Staff member not found." });
+
+                if (!staff.UserID.HasValue || staff.UserID <= 0)
+                    return Ok(new { success = false, message = "This staff member does not have a linked user login account." });
+
+                var (result, message) = _userService.ChangePassword(staff.UserID.Value, req.NewPassword, GetUserId());
+                return Ok(new { success = result == 1, message });
             }
             catch (Exception ex)
             {

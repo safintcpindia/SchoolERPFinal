@@ -64,7 +64,7 @@ namespace SchoolERP.Net.Services
                     new SqlParameter("@VehicleDriverName", (object?)req.VehicleDriverName ?? DBNull.Value),
                     new SqlParameter("@VehicleDriverLicense", (object?)req.VehicleDriverLicense ?? DBNull.Value),
                     new SqlParameter("@VehicleDriverContact", (object?)req.VehicleDriverContact ?? DBNull.Value),
-                    new SqlParameter("@VehicleDriverPhotoAttach", (object?)req.VehicleDriverPhotoAttach ?? DBNull.Value),
+                    new SqlParameter("@VehicleDriverPhotoAttach", SqlDbType.VarBinary) { Value = (object?)req.VehicleDriverPhotoAttach ?? DBNull.Value },
                     new SqlParameter("@VehicleDriverPhotoName", (object?)req.VehicleDriverPhotoName ?? DBNull.Value),
                     new SqlParameter("@VehicleDriverPhotoType", (object?)req.VehicleDriverPhotoType ?? DBNull.Value),
                     new SqlParameter("@VehicleNote", (object?)req.VehicleNote ?? DBNull.Value),

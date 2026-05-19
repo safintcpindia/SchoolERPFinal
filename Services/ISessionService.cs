@@ -21,7 +21,7 @@ namespace SchoolERP.Net.Services
         /// <summary>
         /// Adds a new academic session or updates an existing one.
         /// </summary>
-        (bool success, string message) UpsertSession(MstSessionUpsertRequest request, int userId);
+        (bool success, string message) UpsertSession(MstSessionUpsertRequest request, int userId,int companyId);
 
         /// <summary>
         /// Removes a session from the system.

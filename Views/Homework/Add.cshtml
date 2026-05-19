@@ -21,6 +21,8 @@
     var canAdd = PermHelper.HasPermissionByUrl("/Homework/Add", "Add");
     var canEdit = PermHelper.HasPermissionByUrl("/Homework/Add", "Edit");
     var canDelete = PermHelper.HasPermissionByUrl("/Homework/Add", "Delete");
+    var canPrint = PermHelper.HasPermissionByUrl("/Homework/Add", "Print");
+    var canExport = PermHelper.HasPermissionByUrl("/Homework/Add", "Export");
 }
 
 <!-- Page Header -->
@@ -46,20 +48,26 @@
                 <i class="ti ti-trash me-1"></i>Delete
             </button>
         }
-        <button class="btn btn-secondary d-inline-flex align-items-center" onclick="triggerExport(4)">
-            <i class="ti ti-printer me-1"></i>Print
-        </button>
-        <div class="dropdown d-inline-flex">
-            <button class="btn btn-warning d-inline-flex align-items-center dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                <i class="ti ti-download me-1"></i>Export
+        @if (canPrint)
+        {
+            <button class="btn btn-secondary d-inline-flex align-items-center" onclick="triggerExport(4)">
+                <i class="ti ti-printer me-1"></i>Print
             </button>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(0)"><i class="ti ti-copy me-1"></i>Copy</a></li>
-                <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(1)"><i class="ti ti-file-text me-1"></i>CSV</a></li>
-                <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(2)"><i class="ti ti-file-spreadsheet me-1"></i>Excel</a></li>
-                <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(3)"><i class="ti ti-file-pdf me-1"></i>PDF</a></li>
-            </ul>
-        </div>
+        }
+        @if (canExport)
+        {
+            <div class="dropdown d-inline-flex">
+                <button class="btn btn-info d-inline-flex align-items-center dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="ti ti-download me-1"></i>Export
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(0)"><i class="ti ti-copy me-1"></i>Copy</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(1)"><i class="ti ti-file-text me-1"></i>CSV</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(2)"><i class="ti ti-file-spreadsheet me-1"></i>Excel</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(3)"><i class="ti ti-file-pdf me-1"></i>PDF</a></li>
+                </ul>
+            </div>
+        }
     </div>
 
 </div>

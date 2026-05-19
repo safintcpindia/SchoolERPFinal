@@ -61,27 +61,27 @@
                                         </div>
                                         <div class="col-md-12 mb-3">
                                             <label class="form-label mb-1">Promote In Session<span class="text-danger">*</span></label>
-                                            <select id="NextSessionID" class="form-select form-control">
+                                            <select id="NextSessionID" name="nextSessionId" class="form-select form-control">
                                                 <option value="">Select</option>
                                                 @foreach (var s in Model.Sessions)
                                                 {
-                                                    <option value="@s.SessionId">@s.SessionTitle</option>
+                                                    <option value="@s.SessionId" selected="@(Model.NextSessionId == s.SessionId)">@s.SessionTitle</option>
                                                 }
                                             </select>
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label mb-1">Class<span class="text-danger">*</span></label>
-                                            <select id="NextClassID" class="form-select form-control" onchange="onNextClassChange()">
+                                            <select id="NextClassID" name="nextClassId" class="form-select form-control" onchange="onNextClassChange()">
                                                 <option value="">Select</option>
                                                 @foreach (var c in Model.Classes)
                                                 {
-                                                    <option value="@c.ClassID">@c.ClassName</option>
+                                                    <option value="@c.ClassID" selected="@(Model.NextClassId == c.ClassID)">@c.ClassName</option>
                                                 }
                                             </select>
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label mb-1">Section<span class="text-danger">*</span></label>
-                                            <select id="NextSectionID" class="form-select form-control">
+                                            <select id="NextSectionID" name="nextSectionId" class="form-select form-control">
                                                 <option value="">Select</option>
                                             </select>
                                         </div>
@@ -205,6 +205,12 @@
             const initialSectionId = '@Model.SelectedSectionId';
             if (initialClassId) {
                 loadSections(initialClassId, '#FilterSectionID', initialSectionId);
+            }
+
+            const initialNextClassId = '@Model.NextClassId';
+            const initialNextSectionId = '@Model.NextSectionId';
+            if (initialNextClassId) {
+                loadSections(initialNextClassId, '#NextSectionID', initialNextSectionId);
             }
 
             renderFilterBadges();

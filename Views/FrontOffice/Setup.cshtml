@@ -329,10 +329,22 @@
     const canEdit = @canEdit.ToString().ToLower();
     const canDelete = @canDelete.ToString().ToLower();
 
+    document.addEventListener("DOMContentLoaded", function() {
+        const savedTab = sessionStorage.getItem('activeFoSetupTab');
+        if (savedTab) {
+            const tabEl = document.querySelector(`#foTabs a[data-entity="${savedTab}"]`);
+            if (tabEl) {
+                new bootstrap.Tab(tabEl).show();
+                activeEntity = savedTab;
+            }
+        }
+    });
+
     // Track active tab
     document.querySelectorAll('#foTabs a[data-bs-toggle="pill"]').forEach(tab => {
         tab.addEventListener('shown.bs.tab', e => {
             activeEntity = e.target.dataset.entity;
+            sessionStorage.setItem('activeFoSetupTab', activeEntity);
             resetSelection();
         });
     });

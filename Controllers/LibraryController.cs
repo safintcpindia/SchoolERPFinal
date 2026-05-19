@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using SchoolERP.Net.Models;
 using SchoolERP.Net.Services;
 using System.Security.Claims;
+using System.IO;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace SchoolERP.Net.Controllers
 {
@@ -181,6 +184,74 @@ namespace SchoolERP.Net.Controllers
         {
             var res = _service.ReturnBook(issueId, returnDate, GetCompanyId(), GetUserId());
             return Json(new { success = res.Success, message = res.Message });
+        }
+
+        public IActionResult ImportBook()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ImportBook(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return Json(new { success = false, message = "Please select a CSV file." });
+
+            try
+            {
+                var companyId = GetCompanyId();
+                var userId = GetUserId();
+
+                using var reader = new StreamReader(file.OpenReadStream());
+                string? headerLine = await reader.ReadLineAsync();
+                if (headerLine == null) return Json(new { success = false, message = "File is empty." });
+
+                var headers = headerLine.Split(',').Select(h => h.Trim().ToLower()).ToList();
+                var results = new List<object>();
+
+                while (!reader.EndOfStream)
+                {
+                    string? line = await reader.ReadLineAsync();
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+
+                    var values = line.Split(',').Select(v => v.Trim()).ToList();
+                    var req = new BookUpsertRequest();
+
+                    for (int i = 0; i < headers.Count && i < values.Count; i++)
+                    {
+                        string header = headers[i];
+                        string value = values[i];
+
+                        switch (header)
+                        {
+                            case "book_title": req.BookTitle = value; break;
+                            case "book_no": req.BookNo = value; break;
+                            case "isbn_no": req.ISBNNo = value; break;
+                            case "subject": req.Subject = value; break;
+                            case "rack_no": req.RackNo = value; break;
+                            case "publish": req.Publisher = value; break;
+                            case "author": req.Author = value; break;
+                            case "qty": req.TotalQty = int.TryParse(value, out var qty) ? qty : 0; break;
+                            case "perunitcost": req.BookPrice = decimal.TryParse(value, out var price) ? price : 0; break;
+                            case "postdate": req.PostDate = DateTime.TryParse(value, out var date) ? date : (DateTime?)null; break;
+                            case "description": req.Description = value; break;
+                        }
+                    }
+
+                    var res = _service.UpsertBook(req, companyId, userId);
+                    results.Add(new
+                    {
+                        bookTitle = req.BookTitle,
+                        success = res.Success,
+                        message = res.Message
+                    });
+                }
+                return Json(new { success = true, results });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
     }
 }

@@ -13,11 +13,23 @@
     Layout = "_Layout";
     ViewData["Title"] = "Subject Management";
     
+    var currentUserId = int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("UserId")?.Value, out var id) ? id : 0;
+    if (currentUserId > 0) PermHelper.LoadPermissions(currentUserId);
+    
     // Permission variables for JS
     var canAdd = PermHelper.HasPermissionByUrl("/Academics/Subject", "Add");
     var canEdit = PermHelper.HasPermissionByUrl("/Academics/Subject", "Edit");
     var canDelete = PermHelper.HasPermissionByUrl("/Academics/Subject", "Delete");
 }
+
+<style>
+    .is-invalid + .select2-container .select2-selection {
+        border-color: #dc3545 !important;
+    }
+    .is-invalid ~ .invalid-feedback {
+        display: block !important;
+    }
+</style>
 
 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
     <div>
@@ -125,7 +137,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold">Subject Type <span class="text-danger">*</span></label>
-                            <select class="form-select" id="ddlSubjectType">
+                            <select class="form-select select2" id="ddlSubjectType">
                                 <option value="">Select Type</option>
                                 <option value="Theory">Theory</option>
                                 <option value="Practical">Practical</option>
@@ -147,6 +159,18 @@
 
 @section Scripts {
     <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                dropdownParent: $('#itemModal'),
+                width: '100%'
+            });
+            
+            $('#ddlSubjectType').on('change', function () {
+                $(this).removeClass('is-invalid');
+                $('#errDdlSubjectType').text('');
+            });
+        });
+
         const permCanAdd = @Html.Raw(JsonSerializer.Serialize(canAdd));
         const permCanEdit = @Html.Raw(JsonSerializer.Serialize(canEdit));
         const permCanDelete = @Html.Raw(JsonSerializer.Serialize(canDelete));
@@ -224,6 +248,7 @@
                     document.getElementById('txtSubjectName').value = res.data.subjectName;
                     document.getElementById('txtSubjectCode').value = res.data.subjectCode || '';
                     document.getElementById('ddlSubjectType').value = res.data.subjectType || '';
+                    $('#ddlSubjectType').trigger('change');
                     document.getElementById('isActive').checked = res.data.isActive;
                     
                     itemModal.show();

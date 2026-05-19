@@ -365,9 +365,25 @@ namespace SchoolERP.Net.Controllers
             return Json(new { success = response.Success, message = response.Message });
         }
 
+        [HttpPost]
+        public async Task<IActionResult> DeleteClassTeacherByClassSection(int classId, int sectionId)
+        {
+            var assignmentsResponse = await _academicsClient.GetAllClassTeachersAsync();
+            if (assignmentsResponse.Success)
+            {
+                var matching = assignmentsResponse.Data.Where(a => a.ClassID == classId && a.SectionID == sectionId).ToList();
+                foreach (var a in matching)
+                {
+                    await _academicsClient.DeleteClassTeacherAsync(a.ClassTeacherID);
+                }
+                return Json(new { success = true, message = "Deleted successfully." });
+            }
+            return Json(new { success = false, message = assignmentsResponse.Message ?? "Failed to load assignments." });
+        }
+
         [HttpGet]
         [HttpPost]
-        public async Task<IActionResult> PromoteStudents(int? classId, int? sectionId)
+        public async Task<IActionResult> PromoteStudents(int? classId, int? sectionId, int? nextSessionId, int? nextClassId, int? nextSectionId)
         {
             var classes = await _classClient.GetAllAsync();
             var sessions = await _sessionClient.GetAllAsync();
@@ -377,7 +393,10 @@ namespace SchoolERP.Net.Controllers
                 Classes = classes.Success ? classes.Data : new List<MstClassViewModel>(),
                 Sessions = sessions.Success ? sessions.Data : new List<MstSessionViewModel>(),
                 SelectedClassId = classId,
-                SelectedSectionId = sectionId
+                SelectedSectionId = sectionId,
+                NextSessionId = nextSessionId,
+                NextClassId = nextClassId,
+                NextSectionId = nextSectionId
             };
 
             if (classId.HasValue && sectionId.HasValue)

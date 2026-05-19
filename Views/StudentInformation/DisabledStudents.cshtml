@@ -12,10 +12,32 @@
     if (currentUserId > 0) PermHelper.LoadPermissions(currentUserId);
 }
 
+@section Styles {
+    <style>
+        .dt-buttons { display: none !important; }
+    </style>
+}
+
 <!-- Page Header -->
 <div class="d-flex align-items-sm-center justify-content-between flex-wrap gap-2 mb-2">
     <div>
         <h6 class="fw-bold mb-0">Disabled Students</h6>
+    </div>
+    <div class="d-flex align-items-center flex-wrap gap-1">
+        <button class="btn btn-secondary d-inline-flex align-items-center" type="button" onclick="triggerExport(4)">
+            <i class="ti ti-printer me-1"></i>Print
+        </button>
+        <div class="dropdown d-inline-flex">
+            <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="ti ti-download me-1"></i>Export
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(0)"><i class="ti ti-copy me-1"></i>Copy</a></li>
+                <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(1)"><i class="ti ti-file-text me-1"></i>CSV</a></li>
+                <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(2)"><i class="ti ti-file-spreadsheet me-1"></i>Excel</a></li>
+                <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(3)"><i class="ti ti-file-pdf me-1"></i>PDF</a></li>
+            </ul>
+        </div>
     </div>
 </div>
 <!-- End Page Header -->
@@ -117,8 +139,8 @@
                             </div>
                             <div>
                                 <h6 class="mb-2 fs-15">
-                                    <a href="/StudentInformation/Details/@student.StudentID">@student.FullName</a>
-                                    <span class="badge bg-danger-transparent fs-10 ms-1">Disabled</span>
+                                    <a href="/StudentInformation/Details/@student.StudentID" class="text-primary">@student.FullName</a>
+                                    <span class="badge bg-danger fw-normal rounded-pill fs-10 ms-1">Disabled</span>
                                 </h6>
                                 <div class="d-flex justify-content-between gap-2">
                                     <div class="flex-fill">
@@ -264,7 +286,31 @@
                 }
             });
         }
+
+        function triggerExport(index) {
+            if ($.fn.DataTable.isDataTable('#tblStudents')) {
+                const table = $('#tblStudents').DataTable();
+                table.button(index).trigger();
+            } else {
+                Swal.fire('Info', 'No data available to export', 'info');
+            }
+        }
+
         $(document).ready(function () {
+            // Initialize DataTable
+            $('#tblStudents').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    { extend: 'copy', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7] } },
+                    { extend: 'csv', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7] } },
+                    { extend: 'excel', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7] } },
+                    { extend: 'pdf', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7] } },
+                    { extend: 'print', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7] } }
+                ],
+                searching: false,
+                paging: false,
+                info: false
+            });
             renderFilterBadges();
             
             $('#list-view-btn').click(function (e) {

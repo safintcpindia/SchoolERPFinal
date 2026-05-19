@@ -12,6 +12,7 @@
     <div class="d-flex flex-wrap align-items-center gap-1">
         <button class="btn btn-primary" onclick="openAddModal()"><i class="ti ti-plus me-1"></i>Add</button>
         <button id="btnEdit" class="btn btn-info" disabled onclick="editSelected()"><i class="ti ti-pencil me-1"></i>Edit</button>
+        <button id="btnPreview" class="btn btn-warning" disabled onclick="previewSelected()"><i class="ti ti-eye me-1"></i>Preview</button>
         <button id="btnDelete" class="btn btn-danger" disabled onclick="deleteSelected()"><i class="ti ti-trash me-1"></i>Delete</button>
     </div>
 </div>
@@ -171,6 +172,21 @@
     </div>
 </div>
 
+<!----Preview Modal----->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" style="max-width: 90vw;">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header d-flex align-items-center bg-light">
+                <h5 class="modal-title fw-bold mb-0">Certificate Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 bg-secondary bg-opacity-10 d-flex justify-content-center overflow-auto" style="min-height: 500px;">
+                <div id="previewContainer" class="shadow bg-white"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
     <script>
@@ -185,6 +201,7 @@
             if (radio) radio.checked = true;
             
             document.getElementById('btnEdit').disabled = false;
+            document.getElementById('btnPreview').disabled = false;
             document.getElementById('btnDelete').disabled = false;
         };
 
@@ -203,6 +220,87 @@
             if (selectedCertificateId === 0) return;
             editCertificate(selectedCertificateId);
         };
+
+        window.previewSelected = function() {
+            if (selectedCertificateId === 0) return;
+            $.get('/api/StudentCertificateApi/GetByID/' + selectedCertificateId, function (resp) {
+                if (resp.success && resp.data) {
+                    var template = resp.data;
+                    
+                    var dummyData = {
+                        '\\[name\\]': 'John Doe',
+                        '\\[dob\\]': '15-08-2010',
+                        '\\[present_address\\]': '123 Main Street, City, Country',
+                        '\\[guardian\\]': 'Robert Doe',
+                        '\\[created_at\\]': new Date().toLocaleDateString('en-GB'),
+                        '\\[admission_no\\]': 'ADM-2024-001',
+                        '\\[roll_no\\]': '101',
+                        '\\[class\\]': 'X',
+                        '\\[section\\]': 'A',
+                        '\\[gender\\]': 'Male',
+                        '\\[admission_date\\]': '01-04-2024',
+                        '\\[category\\]': 'General',
+                        '\\[cast\\]': 'None',
+                        '\\[father_name\\]': 'Robert Doe',
+                        '\\[mother_name\\]': 'Jane Doe',
+                        '\\[religion\\]': 'Christianity',
+                        '\\[email\\]': 'student@example.com',
+                        '\\[phone\\]': '9876543210',
+                        '\\[student_photo\\]': template.enableStudentPhoto ? '<img src="/assets/images/default-user.png" style="width:100px; height:100px; object-fit:cover; border-radius:5px; border:1px solid #ccc;" />' : ''
+                    };
+                    
+                    var bodyHtml = template.bodyText || '';
+                    for (const [key, value] of Object.entries(dummyData)) {
+                        bodyHtml = bodyHtml.replace(new RegExp(key, 'gi'), value);
+                    }
+                    
+                    var previewHtml = createCertificatePage(bodyHtml, template);
+                    $('#previewContainer').html(previewHtml);
+                    $('#previewModal').modal('show');
+                } else {
+                    alert('Failed to load template for preview.');
+                }
+            });
+        };
+
+        function createCertificatePage(bodyHtml, template) {
+            var bg = template.backgroundImageBase64 ? 'url(' + template.backgroundImageBase64 + ')' : 'none';
+            
+            // Container: Fixed Dimensions + Flex Stack
+            var containerStyle = 'width:' + (template.bodyWidth || 800) + 'px;' +
+                                 'height:' + (template.bodyHeight || 600) + 'px;' +
+                                 'background-image:' + bg + ';' +
+                                 'display: flex; flex-direction: column;';
+
+            // Header Segment
+            var headerStyle = 'height:' + (template.headerHeight || 0) + 'px; flex-shrink: 0; display: grid; grid-template-columns: 1fr 1fr 1fr; width: 100%; box-sizing: border-box; padding: 0 15px; align-items: center;';
+            
+            // Footer Segment
+            var footerStyle = 'height:' + (template.footerHeight || 0) + 'px; flex-shrink: 0; display: grid; grid-template-columns: 1fr 1fr 1fr; width: 100%; box-sizing: border-box; padding: 0 15px; align-items: center;';
+
+            // Start Building HTML
+            var html = '<div class="certificate-container" style="' + containerStyle + ' margin: 0 auto; overflow: hidden; background-repeat: no-repeat; background-size: 100% 100%; box-sizing: border-box; position: relative;">';
+            
+            // 1. Header (3 Segments)
+            html += '<div style="' + headerStyle + '">' +
+                    '<div style="text-align: left;">' + (template.headerLeftText || '') + '</div>' +
+                    '<div style="text-align: center;">' + (template.headerCenterText || '') + '</div>' +
+                    '<div style="text-align: right;">' + (template.headerRightText || '') + '</div>' +
+                    '</div>';
+
+            // 2. Dynamic Body (Fills remaining space)
+            html += '<div style="flex: 1; overflow: hidden; padding: 20px; box-sizing: border-box;">' + bodyHtml + '</div>';
+
+            // 3. Footer (3 Segments)
+            html += '<div style="' + footerStyle + '">' +
+                    '<div style="text-align: left;">' + (template.footerLeftText || '') + '</div>' +
+                    '<div style="text-align: center;">' + (template.footerCenterText || '') + '</div>' +
+                    '<div style="text-align: right;">' + (template.footerRightText || '') + '</div>' +
+                    '</div>';
+
+            html += '</div>';
+            return html;
+        }
 
         window.deleteSelected = function() {
             if (selectedCertificateId === 0) return;

@@ -32,7 +32,6 @@
         @if (canEdit)
         {
             <button onclick="editSelectedInquiry()" class="btn btn-info"><i class="ti ti-pencil me-1"></i> Edit</button>
-            <button onclick="followUpSelectedInquiry()" class="btn btn-apply"><i class="ti ti-phone-ringing me-1"></i> Follow Up</button>
         }
         @if (canDelete)
         {
@@ -40,6 +39,10 @@
         }
         <a href="#" class="btn btn-secondary"><i class="ti ti-printer me-1"></i> Print</a>
         <a href="#" class="btn btn-warning"><i class="ti ti-download me-1"></i> Export</a>
+        @if (canEdit)
+        {
+            <button onclick="followUpSelectedInquiry()" class="btn btn-apply"><i class="ti ti-phone-ringing me-1"></i> Follow Up</button>
+        }
     </div>
 </div>
 
@@ -501,9 +504,7 @@
                                 <td>${lastDate}</td>
                                 <td>${nextDate}</td>
                                 <td><span class="badge ${badgeClass} rounded-pill">${item.status}</span></td>
-                                <td>
-                                    <button onclick="openFollowUp(${item.inquiryID})" class="btn btn-apply btn-sm"><i class="ti ti-phone-ringing me-1"></i> Follow Up</button>
-                                </td>
+                               
                             </tr>`;
                     });
                     $('#inquiryTable tbody').html(html || '<tr><td colspan="9" class="text-center">No records found</td></tr>');
@@ -540,6 +541,12 @@
                 if (f.type === 'text' || f.type === 'date') {
                     if (value && value.trim() && value !== '0') {
                         text = value;
+                        if (f.type === 'date') {
+                            const parts = value.split('-');
+                            if (parts.length === 3) {
+                                text = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                            }
+                        }
                         activeCount++;
                     }
                 } else if (f.type === 'select') {

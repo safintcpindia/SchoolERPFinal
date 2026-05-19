@@ -126,8 +126,10 @@ namespace SchoolERP.Net.Controllers
             var compRes = await _companyClient.GetAllAsync();
             model.Companies = compRes.Success ? compRes.Data : new List<MstCompanyViewModel>();
 
-            var fieldRes = await _settingsClient.GetAllFieldsAsync(isSystemField: true, belongsTo: "Staff");
-            model.SystemFields = fieldRes.Success ? fieldRes.Data : new List<FieldModel>();
+            var fieldRes = await _settingsClient.GetAllFieldsAsync(isSystemField: null, belongsTo: "Staff");
+            var allFields = fieldRes.Success ? fieldRes.Data : new List<FieldModel>();
+            model.SystemFields = allFields.Where(f => f.IsSystemField).ToList();
+            model.CustomFields = allFields.Where(f => !f.IsSystemField).ToList();
  
             // Step 3: If we are editing an existing person (ID is provided), fetch their details.
 
@@ -187,6 +189,9 @@ namespace SchoolERP.Net.Controllers
                 allStaff = allStaff.Where(s => s.DepartmentName == departmentName).ToList();
             }
 
+            var fieldRes = await _settingsClient.GetAllFieldsAsync(isSystemField: null, belongsTo: "Staff");
+            var allFields = fieldRes.Success ? fieldRes.Data : new List<FieldModel>();
+
             var model = new HRStaffPageViewModel
             {
                 Roles = (await _roleClient.GetAllRolesAsync()).Data ?? new List<MstRoleViewModel>(),
@@ -197,7 +202,9 @@ namespace SchoolERP.Net.Controllers
                 SearchTerm = search,
                 SelectedRole = roleName,
                 SelectedDesignation = designationName,
-                SelectedDepartment = departmentName
+                SelectedDepartment = departmentName,
+                SystemFields = allFields.Where(f => f.IsSystemField).ToList(),
+                CustomFields = allFields.Where(f => !f.IsSystemField).ToList()
             };
 
             return View(model);
@@ -347,6 +354,21 @@ namespace SchoolERP.Net.Controllers
             return View(model);
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> ImportStaff()
+        {
+            var rolesRes = await _roleClient.GetAllRolesAsync();
+            ViewBag.Roles = rolesRes.Success ? rolesRes.Data : new List<MstRoleViewModel>();
+
+            var desigRes = await _hrClient.GetAllDesignationsAsync();
+            ViewBag.Designations = desigRes.Success ? desigRes.Data : new List<HRDesignationViewModel>();
+
+            var deptRes = await _hrClient.GetAllDepartmentsAsync();
+            ViewBag.Departments = deptRes.Success ? deptRes.Data : new List<HRDepartmentViewModel>();
+
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> ImportStaff(int roleId, int designationId, int departmentId, IFormFile file)

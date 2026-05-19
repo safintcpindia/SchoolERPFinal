@@ -49,13 +49,14 @@ namespace SchoolERP.Net.Services
         /// <summary>
         /// Saves or updates academic session information in the database.
         /// </summary>
-        public (bool success, string message) UpsertSession(MstSessionUpsertRequest request, int userId)
+        public (bool success, string message) UpsertSession(MstSessionUpsertRequest request, int userId,int companyId)
         {
             try
             {
                 var parameters = new[]
                 {
                     new SqlParameter("@SessionId", request.SessionId),
+                    new SqlParameter("@CompanyId", companyId),
                     new SqlParameter("@SessionTitle", request.SessionTitle),
                     new SqlParameter("@IsActive", request.IsActive),
                     new SqlParameter("@UserId", userId)
