@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SchoolERP.Net")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ee4b1f319aceb79a5058fdf3b77690562ff94528")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+37ed3a978e98a13417f70240bf17bfe6e8a9ac45")]
 [assembly: System.Reflection.AssemblyProductAttribute("SchoolERP.Net")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SchoolERP.Net")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

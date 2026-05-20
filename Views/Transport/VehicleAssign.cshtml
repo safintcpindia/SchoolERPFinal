@@ -48,14 +48,14 @@
         }
         @if (canPrint)
         {
-            <button class="btn btn-dark d-inline-flex align-items-center shadow-sm" onclick="triggerExport('print')">
+            <button class="btn btn-secondary d-inline-flex align-items-center shadow-sm" onclick="triggerExport('print')">
                 <i class="ti ti-printer me-1"></i> Print
             </button>
         }
         @if (canExport)
         {
             <div class="dropdown d-inline-block">
-                <button class="btn btn-secondary dropdown-toggle d-inline-flex align-items-center shadow-sm" type="button" data-bs-toggle="dropdown">
+                <button class="btn btn-warning dropdown-toggle d-inline-flex align-items-center shadow-sm" type="button" data-bs-toggle="dropdown">
                     <i class="ti ti-download me-1"></i> Export
                 </button>
                 <ul class="dropdown-menu">
@@ -263,7 +263,7 @@
             isActive: true
         };
 
-        fetch('/api/VehicleAssignApi/UpsertAssignments', {
+        fetch('/Transport/UpsertAssignments', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -284,7 +284,7 @@
         
         const aIds = selectedAssignmentIds.split(',');
         const promises = aIds.map(id => 
-            fetch(`/api/VehicleAssignApi/DeleteAssignment/${id}`, { method: 'POST' })
+            fetch(`/Transport/DeleteAssignment/${id}`, { method: 'POST' })
             .then(r => r.json())
         );
         
@@ -301,7 +301,7 @@
     }
 
     function toggleStatus(id, isActive) {
-        fetch(`/api/VehicleAssignApi/ToggleAssignmentStatus?id=${id}&isActive=${isActive}`, { method: 'POST' })
+        fetch(`/Transport/ToggleAssignmentStatus?id=${id}&isActive=${isActive}`, { method: 'POST' })
             .then(r => r.json())
             .then(res => showToast(res.message, res.success ? 'success' : 'danger'));
     }

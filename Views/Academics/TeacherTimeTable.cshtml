@@ -1,7 +1,27 @@
 @model SchoolERP.Net.Models.TeacherTimeTablePageViewModel
+@using System.Security.Claims
+@using SchoolERP.Net.Helpers
+@inject PermissionHelper PermHelper
 @{
     ViewData["Title"] = "Teacher Time Table";
     var days = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+
+    int currentUserId = 0;
+    if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        var idClaim = User.FindFirst(ClaimTypes.NameIdentifier) ?? User.FindFirst("UserId");
+        if (idClaim != null) int.TryParse(idClaim.Value, out currentUserId);
+    }
+    if (currentUserId > 0) PermHelper.LoadPermissions(currentUserId);
+
+    var canPrint = PermHelper.HasPermissionByUrl("/Academics/TeacherTimeTable", "Print");
+    var canExport = PermHelper.HasPermissionByUrl("/Academics/TeacherTimeTable", "Export");
+}
+
+@section Styles {
+    <style>
+        .dt-buttons { display: none !important; }
+    </style>
 }
 
 <!-- Page Header -->
@@ -10,8 +30,13 @@
         <h6 class="fw-bold mb-0">Teacher Timetable</h6>
     </div>
     <div class="d-flex align-items-center flex-wrap gap-1">
-        <!--<a href="/Academics/AddTimeTable" class="btn btn-primary"><i class="ti ti-plus me-1"></i> Add</a>-->
-        <a href="#" class="btn btn-secondary"><i class="ti ti-printer me-1"></i>Print</a>
+        @if (canPrint)
+        {
+            <button class="btn btn-secondary d-inline-flex align-items-center" onclick="triggerExport(4)">
+                <i class="ti ti-printer me-1"></i>Print
+            </button>
+        }
+        
     </div>
 </div>
 <!-- End Page Header -->
@@ -104,8 +129,64 @@
 </div>
 <!-- end row -->
 
+<div class="d-none">
+    <table id="tblTimeTable" class="table">
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Subject</th>
+                <th>Time</th>
+                <th>Class</th>
+                <th>Room No</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.SelectedStaffId > 0)
+            {
+                foreach (var day in days)
+                {
+                    var daySlots = Model.TimeTableSlots.Where(x => x.Day == day).OrderBy(x => x.StartTime).ToList();
+                    if (daySlots.Any())
+                    {
+                        foreach (var slot in daySlots)
+                        {
+                            <tr>
+                                <td>@day</td>
+                                <td>@slot.SubjectName</td>
+                                <td>@slot.StartTime - @slot.EndTime</td>
+                                <td>@slot.ClassName (@slot.SectionName)</td>
+                                <td>@(slot.RoomNo ?? "-")</td>
+                            </tr>
+                        }
+                    }
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
 @section Scripts {
     <script>
+        function triggerExport(index) {
+            const selectedStaffId = @Model.SelectedStaffId;
+            if (selectedStaffId === 0) {
+                if (window.Swal) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'No Data',
+                        text: 'Please select a Teacher and click Filter first!'
+                    });
+                } else {
+                    alert('Please select a Teacher and click Filter first!');
+                }
+                return;
+            }
+            if ($.fn.DataTable.isDataTable('#tblTimeTable')) {
+                const table = $('#tblTimeTable').DataTable();
+                table.button(index).trigger();
+            }
+        }
+
         $(document).ready(function () {
             $('.select2').select2();
 
@@ -113,6 +194,23 @@
             $('.filter-dropdown').on('click', function (e) {
                 e.stopPropagation();
             });
+
+            const selectedStaffId = @Model.SelectedStaffId;
+            if (selectedStaffId > 0) {
+                $('#tblTimeTable').DataTable({
+                    dom: 'Bfrtip',
+                    buttons: [
+                        { extend: 'copy', exportOptions: { columns: [0, 1, 2, 3, 4] } },
+                        { extend: 'csv', exportOptions: { columns: [0, 1, 2, 3, 4] } },
+                        { extend: 'excel', exportOptions: { columns: [0, 1, 2, 3, 4] } },
+                        { extend: 'pdf', exportOptions: { columns: [0, 1, 2, 3, 4] } },
+                        { extend: 'print', exportOptions: { columns: [0, 1, 2, 3, 4] } }
+                    ],
+                    searching: false,
+                    paging: false,
+                    info: false
+                });
+            }
 
             renderFilterBadges();
 

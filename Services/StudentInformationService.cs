@@ -673,6 +673,27 @@ namespace SchoolERP.Net.Services
                 };
                 var dt = _db.ExecuteQuery("SP_STUDENT_LIST_GET", p);
                 
+                // Fetch all custom field values for students once to avoid N+1 queries
+                var customVals = new Dictionary<int, List<StudentCustomFieldValueViewModel>>();
+                try
+                {
+                    var customDt = _db.ExecuteQuery("sp_StudentCustomFieldValues_GetAllActive", new SqlParameter[0]);
+                    foreach (DataRow r in customDt.Rows)
+                    {
+                        int sId = Convert.ToInt32(r["StudentID"]);
+                        if (!customVals.ContainsKey(sId))
+                            customVals[sId] = new List<StudentCustomFieldValueViewModel>();
+
+                        customVals[sId].Add(new StudentCustomFieldValueViewModel
+                        {
+                            FieldID = Convert.ToInt32(r["FieldID"]),
+                            FieldName = r["FieldName"]?.ToString() ?? "",
+                            FieldValue = r["FieldValue"]?.ToString() ?? ""
+                        });
+                    }
+                }
+                catch { }
+
                 // Determine the correct IsActive column name once
                 string activeCol = null;
                 if (dt.Columns.Contains("IsActive")) activeCol = "IsActive";
@@ -694,7 +715,7 @@ namespace SchoolERP.Net.Services
                     
                     if (!isActive) continue; // Skip disabled students
 
-                    list.Add(new StudentListViewModel
+                    var student = new StudentListViewModel
                     {
                         StudentID = Convert.ToInt32(row["STUDENTID"]),
                         AdmissionNo = row["ADMISSIONNO"]?.ToString(),
@@ -711,7 +732,14 @@ namespace SchoolERP.Net.Services
                         StudentPhoto = row["STUDENTPHOTO"] != DBNull.Value ? (byte[])row["STUDENTPHOTO"] : null,
                         StudentPhotoType = row["STUDENTPHOTOTYPE"]?.ToString(),
                         IsActive = isActive
-                    });
+                    };
+
+                    if (customVals.TryGetValue(student.StudentID, out var vals))
+                    {
+                        student.CustomFieldValues = vals;
+                    }
+
+                    list.Add(student);
                 }
             }
             catch { }

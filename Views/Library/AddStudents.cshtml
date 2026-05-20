@@ -1,7 +1,25 @@
-
+@model SchoolERP.Net.Models.HRDepartmentPageViewModel
+@using System.Security.Claims
+@using SchoolERP.Net.Helpers
+@inject PermissionHelper PermHelper
 @{
     ViewData["Title"] = "Library Students Membership";
+    int currentUserId = 0;
+    if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        var idClaim = User.FindFirst(ClaimTypes.NameIdentifier) ?? User.FindFirst("UserId");
+        if (idClaim != null) int.TryParse(idClaim.Value, out currentUserId);
+    }
+    if (currentUserId > 0) PermHelper.LoadPermissions(currentUserId);
+
+    var canPrint = PermHelper.HasPermissionByUrl("/Library/Books", "Print");
+    var canExport = PermHelper.HasPermissionByUrl("/Library/Books", "Export");
 }
+
+<style>
+.dt-buttons { display: none !important; }
+</style>
+
 
 <!-- Page Header -->
 <div class="d-flex align-items-sm-center justify-content-between flex-wrap gap-2 mb-2">
@@ -9,9 +27,27 @@
         <h6 class="fw-bold mb-0">Library Students Membership</h6>
     </div>
     <div class="d-flex align-items-center flex-wrap gap-1">
-        <a href="javascript:window.print();" class="btn btn-secondary d-inline-flex align-items-center">
-            <i class="ti ti-printer me-1"></i>Print
-        </a>
+        @if (canPrint)
+        {
+            <button class="btn btn-secondary d-inline-flex align-items-center" onclick="triggerExport(4)">
+                <i class="ti ti-printer me-1"></i>Print
+            </button>
+        }
+        @if (canExport)
+        {
+            <div class="dropdown d-inline-flex">
+                <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="ti ti-download me-1"></i>Export
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(0)"><i class="ti ti-copy me-1"></i>Copy</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(1)"><i class="ti ti-file-text me-1"></i>CSV</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(2)"><i class="ti ti-file-spreadsheet me-1"></i>Excel</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(3)"><i class="ti ti-file-description me-1"></i>PDF</a></li>
+                </ul>
+            </div>
+        }
+
     </div>
 </div>
 
@@ -92,9 +128,7 @@
                             </tr>
                         </thead>
                         <tbody id="listBody">
-                            <tr>
-                                <td colspan="8" class="text-center py-4 text-muted">Please select filters to load students.</td>
-                            </tr>
+                            
                         </tbody>
                     </table>
                 </div>
@@ -136,7 +170,38 @@
 @section Scripts {
     <script src="~/assets/plugins/sweetalert/sweetalert2.all.min.js"></script>
     <script>
+
+function triggerExport(index) {
+        if ($.fn.DataTable.isDataTable('#tblMembers')) {
+                const table = $('#tblMembers').DataTable();
+            table.button(index).trigger();
+        }
+    }
+        let table;
+
+
+
+
         $(document).ready(function () {
+
+            table = $('#tblMembers').DataTable({
+                destroy: true,
+                dom: 'Bfrtip',
+                buttons: [
+                    { extend: 'copy', exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
+                    { extend: 'csv', exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
+                    { extend: 'excel', exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
+                    { extend: 'pdf', exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
+                    { extend: 'print', exportOptions: { columns: [1, 2, 3, 4, 5, 6] } }
+                ],
+                searching: false,
+                paging: false,
+                info: false,
+                language: {
+                    emptyTable: "Please select filters to load students."
+                }
+            });
+
             $('.select2').select2({ width: '100%' });
             $('#filter-dropdown').on('click', function (e) {
                 e.stopPropagation();
@@ -158,54 +223,67 @@
         }
 
         function loadData() {
+
             const classId = $('#fClass').val();
             const sectionId = $('#fSection').val();
             const search = $('#txtSearchInput').val();
 
+            table.clear().draw();
+
             if (!classId && !search) {
-                $('#listBody').html('<tr><td colspan="8" class="text-center py-4 text-muted">Please select Class or enter Search term.</td></tr>');
                 renderFilterBadges();
                 return;
             }
 
-            $('#listBody').html('<tr><td colspan="8" class="text-center py-5"><div class="spinner-border text-primary"></div></td></tr>');
+            $.get('/Library/GetMemberList', {
+                type: 'Student',
+                classId: classId || '',
+                sectionId: sectionId || '',
+                search: search || ''
+            }, function (res) {
 
-            $.get('/Library/GetMemberList', { type: 'Student', classId: classId || '', sectionId: sectionId || '', search: search || '' }, function (res) {
-                let html = '';
                 if (res.success && res.data && res.data.length > 0) {
+
                     res.data.forEach((item, index) => {
+
                         const isMember = item.libraryMemberID > 0;
-                        html += `
-                            <tr>
-                                <td class="ps-3">${index + 1}</td>
-                                <td>${item.admissionNo}</td>
-                                <td class="fw-semibold text-primary">${item.name}</td>
-                                <td>${item.className}</td>
-                                <td class="fw-bold">${item.libraryCardNo || '-'}</td>
-                                <td>${item.fatherName}</td>
-                                <td>${item.registeredOn ? new Date(item.registeredOn).toLocaleDateString('en-GB') : '-'}</td>
-                                <td class="text-center">
-                                    ${isMember ? 
-                                        `<button class="btn btn-outline-danger btn-sm px-3" onclick="deleteMembership(${item.studentID})">
-                                            <i class="ti ti-trash me-1"></i>Remove
-                                         </button>` : 
-                                        `<button class="btn btn-outline-success btn-sm px-3" onclick="openCardModal(${item.studentID}, '${item.name.replace("'", "\\'")}')">
-                                            <i class="ti ti-plus me-1"></i>Add
-                                         </button>`
-                                    }
-                                </td>
-                            </tr>
-                        `;
+
+                        const actionBtn = isMember
+                            ? `<button class="btn btn-outline-danger btn-sm px-3"
+                                    onclick="deleteMembership(${item.studentID})">
+                                    <i class="ti ti-trash me-1"></i>Remove
+                               </button>`
+                            : `<button class="btn btn-outline-success btn-sm px-3"
+                                    onclick="openCardModal(${item.studentID}, '${item.name.replace(/'/g, "\\'")}')">
+                                    <i class="ti ti-plus me-1"></i>Add
+                               </button>`;
+
+                        table.row.add([
+                            index + 1,
+                            item.admissionNo || '-',
+                            `<span class="fw-semibold text-primary">${item.name || '-'}</span>`,
+                            item.className || '-',
+                            `<span class="fw-bold">${item.libraryCardNo || '-'}</span>`,
+                            item.fatherName || '-',
+                            item.registeredOn
+                                ? new Date(item.registeredOn).toLocaleDateString('en-GB')
+                                : '-',
+                            `<div class="text-center">${actionBtn}</div>`
+                        ]);
+
                     });
-                } else {
-                    html = '<tr><td colspan="8" class="text-center py-4 text-muted">No students found.</td></tr>';
                 }
-                $('#listBody').html(html);
+
+                table.draw();
+
                 renderFilterBadges();
+
                 const toggle = document.getElementById('btnFilterToggle');
+
                 if (toggle) {
                     bootstrap.Dropdown.getOrCreateInstance(toggle).hide();
                 }
+
             });
         }
 

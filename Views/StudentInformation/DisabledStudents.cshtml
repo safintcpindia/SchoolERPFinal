@@ -35,7 +35,7 @@
                 <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(0)"><i class="ti ti-copy me-1"></i>Copy</a></li>
                 <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(1)"><i class="ti ti-file-text me-1"></i>CSV</a></li>
                 <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(2)"><i class="ti ti-file-spreadsheet me-1"></i>Excel</a></li>
-                <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(3)"><i class="ti ti-file-pdf me-1"></i>PDF</a></li>
+                <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(3)"><i class="ti ti-file-description me-1"></i>PDF</a></li>
             </ul>
         </div>
     </div>
@@ -267,7 +267,7 @@
                     };
 
                     $.ajax({
-                        url: '/api/StudentInformationApi/ToggleStatus',
+                        url: '/StudentInformation/ToggleStatus',
                         type: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify(data),

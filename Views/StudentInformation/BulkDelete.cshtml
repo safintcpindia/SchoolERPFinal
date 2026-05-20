@@ -13,6 +13,14 @@
     if (currentUserId > 0) PermHelper.LoadPermissions(currentUserId);
 
     var canDelete = PermHelper.HasPermissionByUrl("/StudentInformation/BulkDelete", "Delete");
+    var canPrint = PermHelper.HasPermissionByUrl("/StudentInformation/BulkDelete", "Print");
+    var canExport = PermHelper.HasPermissionByUrl("/StudentInformation/BulkDelete", "Export");
+}
+
+@section Styles {
+    <style>
+        .dt-buttons { display: none !important; }
+    </style>
 }
 
 <!-- Page Header -->
@@ -27,9 +35,26 @@
                 <i class="ti ti-trash me-1"></i>Delete Selected
             </button>
         }
-        <a href="javascript:window.print();" class="btn btn-secondary d-inline-flex align-items-center">
-            <i class="ti ti-printer me-1"></i>Print
-        </a>
+        @if (canPrint)
+        {
+            <button class="btn btn-secondary d-inline-flex align-items-center" onclick="triggerExport(4)">
+                <i class="ti ti-printer me-1"></i>Print
+            </button>
+        }
+        @if (canExport)
+        {
+            <div class="dropdown d-inline-flex">
+                <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="ti ti-download me-1"></i>Export
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(0)"><i class="ti ti-copy me-1"></i>Copy</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(1)"><i class="ti ti-file-text me-1"></i>CSV</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(2)"><i class="ti ti-file-spreadsheet me-1"></i>Excel</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(3)"><i class="ti ti-file-description me-1"></i>PDF</a></li>
+                </ul>
+            </div>
+        }
     </div>
 </div>
 <!-- End Page Header -->
@@ -133,6 +158,15 @@
 @section Scripts {
     <script src="~/assets/plugins/sweetalert/sweetalert2.all.min.js"></script>
     <script>
+        function triggerExport(index) {
+            if ($.fn.DataTable.isDataTable('#tblStudents')) {
+                const table = $('#tblStudents').DataTable();
+                table.button(index).trigger();
+            } else {
+                Swal.fire('Info', 'No data available to export', 'info');
+            }
+        }
+
         $(document).ready(function () {
             $('#ddlClass').change(function () {
                 var classId = $(this).val();
@@ -169,6 +203,10 @@
                 return;
             }
 
+            if ($.fn.DataTable.isDataTable('#tblStudents')) {
+                $('#tblStudents').DataTable().destroy();
+            }
+
             $('#studentListBody').html('<tr><td colspan="8" class="text-center py-4"><div class="spinner-border text-primary"></div></td></tr>');
             $('#selectAll').prop('checked', false);
             $('#btnBulkDelete').prop('disabled', true);
@@ -200,6 +238,23 @@
                     html = '<tr><td colspan="8" class="text-center py-4 text-muted">No active students found.</td></tr>';
                 }
                 $('#studentListBody').html(html);
+
+                if (data && data.length > 0) {
+                    $('#tblStudents').DataTable({
+                        dom: 'Bfrtip',
+                        buttons: [
+                            { extend: 'copy', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7] } },
+                            { extend: 'csv', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7] } },
+                            { extend: 'excel', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7] } },
+                            { extend: 'pdf', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7] } },
+                            { extend: 'print', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7] } }
+                        ],
+                        searching: false,
+                        paging: false,
+                        info: false
+                    });
+                }
+
                 renderFilterBadges();
             });
         }

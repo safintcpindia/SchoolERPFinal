@@ -2,16 +2,61 @@
 @{
     ViewData["Title"] = "Payroll";
 }
+@inject PermissionHelper PermHelper
+@{
 
+    int currentUserId = 0;
+    if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        var idClaim = User.FindFirst(ClaimTypes.NameIdentifier) ?? User.FindFirst("UserId");
+        if (idClaim != null) int.TryParse(idClaim.Value, out currentUserId);
+    }
+    if (currentUserId > 0) PermHelper.LoadPermissions(currentUserId);
+
+    var canAdd = PermHelper.HasPermissionByUrl("/HumanResource/Payroll", "Add");
+    var canPrint = PermHelper.HasPermissionByUrl("/HumanResource/Payroll", "Print");
+    var canExport = PermHelper.HasPermissionByUrl("/HumanResource/Payroll", "Export");
+
+}
+<style>
+    .dt-buttons {
+        display: none !important;
+    }
+</style>
 <!-- Page Header -->
 <div class="d-flex align-items-sm-center justify-content-between flex-wrap gap-2 mb-2">
     <div>
         <h6 class="fw-bold mb-0">Payroll </h6>
     </div>
     <div class="d-flex align-items-center flex-wrap gap-1">
-        <button id="btnGenerate" onclick="handleGenerate()" class="btn btn-primary btn-sm d-inline-flex align-items-center" disabled><i class="ti ti-plus me-1"></i>Generate</button>
-        <button id="btnPay" onclick="handlePay()" class="btn btn-success btn-sm d-inline-flex align-items-center" disabled><i class="ti ti-wallet me-1"></i>Proceed To Pay</button>
+         
+        @if (canAdd)
+        {
+            <button id="btnGenerate" onclick="handleGenerate()" class="btn btn-primary btn-sm d-inline-flex align-items-center" disabled><i class="ti ti-plus me-1"></i>Generate</button>
+            <button id="btnPay" onclick="handlePay()" class="btn btn-success btn-sm d-inline-flex align-items-center" disabled><i class="ti ti-wallet me-1"></i>Proceed To Pay</button>
+        }
+        
         <button id="btnView" onclick="handleView()" class="btn btn-info btn-sm d-inline-flex align-items-center" disabled><i class="ti ti-eye me-1"></i>View Payslip</button>
+        @if (canPrint)
+        {
+            <button class="btn btn-secondary d-inline-flex align-items-center" onclick="triggerExport(4)">
+                <i class="ti ti-printer me-1"></i>Print
+            </button>
+        }
+        @if (canExport)
+        {
+            <div class="dropdown d-inline-flex">
+                <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="ti ti-download me-1"></i>Export
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(0)"><i class="ti ti-copy me-1"></i>Copy</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(1)"><i class="ti ti-file-text me-1"></i>CSV</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(2)"><i class="ti ti-file-spreadsheet me-1"></i>Excel</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(3)"><i class="ti ti-file-description me-1"></i>PDF</a></li>
+                </ul>
+            </div>
+        }
     </div>
 </div>
 <!-- End Page Header -->
@@ -116,9 +161,7 @@
                         </thead>
                         <tbody id="payrollBody">
                             <!-- Data will be loaded via AJAX -->
-                            <tr>
-                                <td colspan="9" class="text-center">Please select criteria and click Filter to load data.</td>
-                            </tr>
+                            
                         </tbody>
                     </table>
                 </div>
@@ -130,6 +173,45 @@
 @section Scripts {
     <script src="~/assets/plugins/sweetalert/sweetalert2.all.min.js"></script>
     <script>
+
+        function triggerExport(index) {
+            if ($.fn.DataTable.isDataTable('#payrollTable')) {
+                const table = $('#payrollTable').DataTable();
+            table.button(index).trigger();
+        }
+    }
+
+        function initializeDataTable() {
+
+            if ($.fn.DataTable.isDataTable('#payrollTable')) {
+                $('#payrollTable').DataTable().destroy();
+            }
+
+            $('#payrollTable').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    { extend: 'copy', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7] } },
+                    { extend: 'csv', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7] } },
+                    { extend: 'excel', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7] } },
+                    { extend: 'pdf', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7] } },
+                    { extend: 'print', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7] } }
+                ],
+                searching: false,
+                paging: false,
+                info: false,
+                ordering: false,
+                destroy: true,
+                language: {
+                    emptyTable: "Please select criteria and click Filter to load data."
+                }
+            });
+        }
+
+$(document).ready(function () {
+            
+})
+
+
         $(document).ready(function () {
             // Initial load if desired
             loadPayroll();
@@ -152,12 +234,13 @@
             $('[data-bs-toggle="dropdown"]').dropdown('hide');
 
             $.ajax({
-                url: `/api/HumanResourceApi/GetAllPayroll?month=${month}&year=${year}&roleId=${roleId || ''}`,
+                url: `/HumanResource/GetAllPayroll?month=${month}&year=${year}&roleId=${roleId || ''}`,
                 type: 'GET',
                 success: function (res) {
                     console.log("Payroll API Response:", res);
                     if (res.success) {
                         renderPayrollTable(res.data);
+                        initializeDataTable();
                         renderFilterBadges();
                     } else {
                         Swal.fire('Error', res.message, 'error');
@@ -175,7 +258,7 @@
             body.empty();
 
             if (data.length === 0) {
-                body.append('<tr><td colspan="9" class="text-center text-danger">No records found.</td></tr>');
+                
                 return;
             }
 
@@ -268,7 +351,7 @@
         function viewPayslip(id) {
             console.log("Fetching payslip for ID:", id);
             $.ajax({
-                url: `/api/HumanResourceApi/GetPayrollDetails/${id}`,
+                url: `/HumanResource/GetPayrollDetails/${id}`,
                 type: 'GET',
                 success: function (res) {
                     console.log("Payslip API Response:", res);
@@ -460,7 +543,7 @@
             };
 
             $.ajax({
-                url: '/api/HumanResourceApi/PayPayroll',
+                url: '/HumanResource/PayPayroll',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(data),

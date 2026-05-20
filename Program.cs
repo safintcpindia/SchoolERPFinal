@@ -295,10 +295,14 @@ builder.Services.AddAuthentication(options =>
         {
             if (string.IsNullOrEmpty(context.Token))
             {
-                var cookieToken = context.Request.Cookies["token"];
-                if (!string.IsNullOrEmpty(cookieToken))
+                var path = context.Request.Path;
+                if (!path.StartsWithSegments("/api", StringComparison.OrdinalIgnoreCase))
                 {
-                    context.Token = cookieToken;
+                    var cookieToken = context.Request.Cookies["token"];
+                    if (!string.IsNullOrEmpty(cookieToken))
+                    {
+                        context.Token = cookieToken;
+                    }
                 }
             }
             return Task.CompletedTask;

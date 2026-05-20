@@ -25,5 +25,7 @@ namespace SchoolERP.Net.Services.Clients
         Task<ApiResponse<bool>> UpsertFieldAsync(FieldViewModel model);
         Task<ApiResponse<bool>> DeleteFieldAsync(int id);
         Task<ApiResponse<bool>> ToggleFieldStatusAsync(int id, bool isActive);
+        Task<ApiResponse<List<IDAutoGenSettings>>> GetIDAutoGenSettingsAsync();
+        Task<ApiResponse<bool>> SaveIDAutoGenSettingsAsync(IDAutoGenRequest req);
     }
 }

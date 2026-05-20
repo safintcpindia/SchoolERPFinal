@@ -78,5 +78,65 @@ namespace SchoolERP.Net.Controllers
             if (!res.Success) ViewBag.ErrorMessage = res.Message;
             return View(model);
         }
+
+        #region Account Head API Endpoints
+        [HttpGet]
+        public async Task<IActionResult> GetAccountHeadByID(int id)
+        {
+            var res = await _headClient.GetAccountHeadByIDAsync(id);
+            return Json(res);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpsertAccountHead([FromBody] AccountHeadUpsertRequest req)
+        {
+            var res = await _headClient.UpsertAccountHeadAsync(req);
+            return Json(res);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteAccountHead(int id)
+        {
+            var res = await _headClient.DeleteAccountHeadAsync(id);
+            return Json(res);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleAccountHeadStatus(int id, bool isActive)
+        {
+            var res = await _headClient.ToggleAccountHeadStatusAsync(id, isActive);
+            return Json(res);
+        }
+        #endregion
+
+        #region Account Entry API Endpoints
+        [HttpGet]
+        public async Task<IActionResult> GetAccountEntryByID(int id)
+        {
+            var res = await _entryClient.GetAccountEntryByIDAsync(id);
+            return Json(res);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpsertAccountEntry([FromBody] AccountEntryUpsertRequest req)
+        {
+            var res = await _entryClient.UpsertAccountEntryAsync(req);
+            return Json(res);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteAccountEntry(int id)
+        {
+            var res = await _entryClient.DeleteAccountEntryAsync(id);
+            return Json(res);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleAccountEntryStatus(int id, bool isActive)
+        {
+            var res = await _entryClient.ToggleAccountEntryStatusAsync(id, isActive);
+            return Json(res);
+        }
+        #endregion
     }
 }

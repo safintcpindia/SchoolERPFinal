@@ -29,5 +29,19 @@ namespace SchoolERP.Net.Controllers
             var response = await _companyClient.SetCurrentCompanyAsync(request);
             return Json(new { success = response.Success, message = response.Message });
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAssignedCompanies()
+        {
+            var response = await _companyClient.GetAssignedCompaniesAsync();
+            return Json(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUserCurrentCompany()
+        {
+            var response = await _companyClient.GetUserCurrentCompanyAsync();
+            return Json(new { success = true, data = response.Data });
+        }
     }
 }

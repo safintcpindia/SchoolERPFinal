@@ -249,7 +249,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '/api/HumanResourceApi/SaveDetailedPayroll',
+                        url: '/HumanResource/SaveDetailedPayroll',
                         type: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify(data),

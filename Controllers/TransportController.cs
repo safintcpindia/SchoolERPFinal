@@ -31,25 +31,48 @@ namespace SchoolERP.Net.Controllers
             _rppClient = rppClient;
         }
 
-        /// <summary>
-        /// Shows the 'Pickup Point' page where you can manage all the different bus stops for the school.
-        /// </summary>
+        #region Pickup Point Endpoints
         public async Task<IActionResult> PickupPoint()
         {
-            // Step 1: Ask the system for a list of all current bus stops (pickup points).
             var res = await _pickupPointClient.GetAllPickupPointsAsync();
-            
-            // Step 2: Prepare the data to be shown on the stop management page.
             var model = new PickupPointPageViewModel
             {
                 Items = res.Success ? res.Data : new List<PickupPointViewModel>()
             };
             if (!res.Success) ViewBag.ErrorMessage = res.Message;
-            
-            // Step 3: Open the 'Pickup Point' page.
             return View(model);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetPickupPointByID(int id)
+        {
+            var res = await _pickupPointClient.GetPickupPointByIDAsync(id);
+            return Json(new { success = res.Success, data = res.Data, message = res.Message });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpsertPickupPoint([FromBody] PickupPointUpsertRequest request)
+        {
+            var res = await _pickupPointClient.UpsertPickupPointAsync(request);
+            return Json(new { success = res.Success, message = res.Message });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeletePickupPoint(int id)
+        {
+            var res = await _pickupPointClient.DeletePickupPointAsync(id);
+            return Json(new { success = res.Success, message = res.Message });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> TogglePickupPointStatus(int id, bool isActive)
+        {
+            var res = await _pickupPointClient.TogglePickupPointStatusAsync(id, isActive);
+            return Json(new { success = res.Success, message = res.Message });
+        }
+        #endregion
+
+        #region Routes Endpoints
         public async Task<IActionResult> Routes()
         {
             var res = await _routeClient.GetAllRoutesAsync();
@@ -61,6 +84,36 @@ namespace SchoolERP.Net.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetRouteByID(int id)
+        {
+            var res = await _routeClient.GetRouteByIDAsync(id);
+            return Json(new { success = res.Success, data = res.Data, message = res.Message });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpsertRoute([FromBody] RouteUpsertRequest request)
+        {
+            var res = await _routeClient.UpsertRouteAsync(request);
+            return Json(new { success = res.Success, message = res.Message });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteRoute(int id)
+        {
+            var res = await _routeClient.DeleteRouteAsync(id);
+            return Json(new { success = res.Success, message = res.Message });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleRouteStatus(int id, bool isActive)
+        {
+            var res = await _routeClient.ToggleRouteStatusAsync(id, isActive);
+            return Json(new { success = res.Success, message = res.Message });
+        }
+        #endregion
+
+        #region Vehicles Endpoints
         public async Task<IActionResult> Vehicles()
         {
             var res = await _vehicleClient.GetAllVehiclesAsync();
@@ -72,17 +125,42 @@ namespace SchoolERP.Net.Controllers
             return View(model);
         }
 
-        /// <summary>
-        /// Shows the 'Vehicle Assignment' page where you can decide which buses or vans will drive on which school routes.
-        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> GetVehicleByID(int id)
+        {
+            var res = await _vehicleClient.GetVehicleByIDAsync(id);
+            return Json(new { success = res.Success, data = res.Data, message = res.Message });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpsertVehicle([FromForm] VehicleFormModel form)
+        {
+            var res = await _vehicleClient.UpsertVehicleAsync(form);
+            return Json(new { success = res.Success, message = res.Message });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteVehicle(int id)
+        {
+            var res = await _vehicleClient.DeleteVehicleAsync(id);
+            return Json(new { success = res.Success, message = res.Message });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleVehicleStatus(int id, bool isActive)
+        {
+            var res = await _vehicleClient.ToggleVehicleStatusAsync(id, isActive);
+            return Json(new { success = res.Success, message = res.Message });
+        }
+        #endregion
+
+        #region Vehicle Assign Endpoints
         public async Task<IActionResult> VehicleAssign()
         {
-            // Step 1: Fetch the list of current vehicle assignments, all routes, and all vehicles from the system.
             var res = await _vehicleAssignClient.GetAllAssignmentsAsync();
             var routesRes = await _routeClient.GetAllRoutesAsync();
             var vehiclesRes = await _vehicleClient.GetAllVehiclesAsync();
  
-            // Step 2: Combine all this information so it can be managed on one screen.
             var model = new VehicleAssignPageViewModel
             {
                 Items = res.Success ? res.Data : new List<VehicleAssignViewModel>(),
@@ -91,11 +169,32 @@ namespace SchoolERP.Net.Controllers
             };
             
             if (!res.Success) ViewBag.ErrorMessage = res.Message;
-            
-            // Step 3: Open the 'Vehicle Assignment' management page.
             return View(model);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> UpsertAssignments([FromBody] VehicleAssignUpsertRequest request)
+        {
+            var res = await _vehicleAssignClient.UpsertAssignmentsAsync(request);
+            return Json(new { success = res.Success, message = res.Message });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteAssignment(int id)
+        {
+            var res = await _vehicleAssignClient.DeleteAssignmentAsync(id);
+            return Json(new { success = res.Success, message = res.Message });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleAssignmentStatus(int id, bool isActive)
+        {
+            var res = await _vehicleAssignClient.ToggleAssignmentStatusAsync(id, isActive);
+            return Json(new { success = res.Success, message = res.Message });
+        }
+        #endregion
+
+        #region Route Pickup Points Endpoints
         public async Task<IActionResult> RoutePickupPoints()
         {
             var res = await _rppClient.GetAllRoutePickupPointsAsync();
@@ -112,5 +211,34 @@ namespace SchoolERP.Net.Controllers
             if (!res.Success) ViewBag.ErrorMessage = res.Message;
             return View(model);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetRoutePickupPointByID(int id)
+        {
+            var res = await _rppClient.GetRoutePickupPointByIDAsync(id);
+            return Json(new { success = res.Success, data = res.Data, message = res.Message });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpsertRoutePickupPoint([FromBody] RoutePickupPointUpsertRequest request)
+        {
+            var res = await _rppClient.UpsertRoutePickupPointAsync(request);
+            return Json(new { success = res.Success, message = res.Message });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteRoutePickupPoint(int id)
+        {
+            var res = await _rppClient.DeleteRoutePickupPointAsync(id);
+            return Json(new { success = res.Success, message = res.Message });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleRoutePickupPointStatus(int id, bool isActive)
+        {
+            var res = await _rppClient.ToggleRoutePickupPointStatusAsync(id, isActive);
+            return Json(new { success = res.Success, message = res.Message });
+        }
+        #endregion
     }
 }

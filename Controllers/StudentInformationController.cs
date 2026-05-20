@@ -5,6 +5,9 @@ using System.Security.Claims;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Collections.Generic;
+using System;
 
 namespace SchoolERP.Net.Controllers
 {
@@ -26,9 +29,9 @@ namespace SchoolERP.Net.Controllers
         private readonly IClassService _classService;
         private readonly ISectionService _sectionService;
         private readonly IVehicleAssignService _vehicleAssignService;
+        private readonly IAttendanceService _attendanceService;
 
-
-        public StudentInformationController(IStudentInformationService studentService, ICompanyService companyService, ISessionService sessionService, IFieldService fieldService, IRouteService routeService, IRoutePickupPointService routePickupPointService, IHostelService hostelService, IClassService classService, ISectionService sectionService, IVehicleAssignService vehicleAssignService)
+        public StudentInformationController(IStudentInformationService studentService, ICompanyService companyService, ISessionService sessionService, IFieldService fieldService, IRouteService routeService, IRoutePickupPointService routePickupPointService, IHostelService hostelService, IClassService classService, ISectionService sectionService, IVehicleAssignService vehicleAssignService, IAttendanceService attendanceService)
         {
             _studentService = studentService;
             _companyService = companyService;
@@ -40,6 +43,7 @@ namespace SchoolERP.Net.Controllers
             _classService = classService;
             _sectionService = sectionService;
             _vehicleAssignService = vehicleAssignService;
+            _attendanceService = attendanceService;
         }
 
 
@@ -166,13 +170,16 @@ namespace SchoolERP.Net.Controllers
             var companyId = GetCompanyId();
             var sessionId = GetSessionId();
             
+            var allFields = _fieldService.GetAllFields(companyId, sessionId, belongsTo: "students");
             var model = new StudentListPageViewModel
             {
                 Students = _studentService.GetStudentList(companyId, sessionId, classId, sectionId, search),
                 SelectedClassId = classId,
                 SelectedSectionId = sectionId,
                 SearchTerm = search,
-                ViewType = viewType ?? "list"
+                ViewType = viewType ?? "list",
+                SystemFields = allFields.Where(f => f.IsSystemField).ToList(),
+                CustomFields = allFields.Where(f => !f.IsSystemField).ToList()
             };
 
             ViewBag.Classes = _classService.GetAllClasses(companyId, sessionId);
@@ -445,5 +452,192 @@ namespace SchoolERP.Net.Controllers
                 _ => ""
             };
         }
+
+        #region Extracted API Endpoints
+
+        [HttpGet]
+        public IActionResult GetStudentAttendanceHistory(int id, int year)
+        {
+            try
+            {
+                var data = _attendanceService.GetStudentAttendanceHistory(id, year, GetCompanyId());
+                return Json(new { success = true, data });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error: " + ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult GetAllDisableReasons()
+        {
+            var data = _studentService.GetAllDisableReasons(GetCompanyId(), GetSessionId());
+            return Json(new { success = true, data });
+        }
+
+        [HttpPost]
+        public IActionResult UpsertDisableReason([FromBody] StudentDisableReasonUpsertRequest req)
+        {
+            var res = _studentService.UpsertDisableReason(req, GetCompanyId(), GetSessionId(), GetUserId());
+            return Json(new { success = res.Success, message = res.Message });
+        }
+
+        [HttpPost]
+        public IActionResult DeleteDisableReason(int id)
+        {
+            var res = _studentService.DeleteDisableReason(id, GetUserId());
+            return Json(new { success = res.Success, message = res.Message });
+        }
+
+        [HttpGet]
+        public IActionResult GetAllStudentHouses()
+        {
+            var data = _studentService.GetAllStudentHouses(GetCompanyId(), GetSessionId());
+            return Json(new { success = true, data });
+        }
+
+        [HttpPost]
+        public IActionResult UpsertStudentHouse([FromBody] StudentHouseUpsertRequest req)
+        {
+            var res = _studentService.UpsertStudentHouse(req, GetCompanyId(), GetSessionId(), GetUserId());
+            return Json(new { success = res.Success, message = res.Message });
+        }
+
+        [HttpPost]
+        public IActionResult DeleteStudentHouse(int id)
+        {
+            var res = _studentService.DeleteStudentHouse(id, GetUserId());
+            return Json(new { success = res.Success, message = res.Message });
+        }
+
+        [HttpGet]
+        public IActionResult GetAllStudentCategories()
+        {
+            var data = _studentService.GetAllStudentCategories(GetCompanyId(), GetSessionId());
+            return Json(new { success = true, data });
+        }
+
+        [HttpPost]
+        public IActionResult UpsertStudentCategory([FromBody] StudentCategoryUpsertRequest req)
+        {
+            var res = _studentService.UpsertStudentCategory(req, GetCompanyId(), GetSessionId(), GetUserId());
+            return Json(new { success = res.Success, message = res.Message });
+        }
+
+        [HttpPost]
+        public IActionResult DeleteStudentCategory(int id)
+        {
+            var res = _studentService.DeleteStudentCategory(id, GetUserId());
+            return Json(new { success = res.Success, message = res.Message });
+        }
+
+        [HttpGet]
+        public IActionResult GetStudentTimeline(int id)
+        {
+            try
+            {
+                var data = _studentService.GetStudentTimeline(id);
+                return Json(new { success = true, data });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Database Error: " + ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult UpsertTimeline([FromBody] StudentTimelineUpsertRequest req)
+        {
+            try
+            {
+                var result = _studentService.UpsertStudentTimeline(req, GetCompanyId(), GetSessionId(), GetUserId());
+                return Json(new { success = result.Success, message = result.Message });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Database Error: " + ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult DeleteTimeline(int id)
+        {
+            try
+            {
+                var result = _studentService.DeleteStudentTimeline(id, GetUserId());
+                return Json(new { success = result.Success, message = result.Message });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Database Error: " + ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult DownloadTimelineDoc(int id)
+        {
+            var (bytes, fileName, contentType) = _studentService.GetStudentTimelineDocument(id);
+            if (bytes == null) return NotFound();
+            return File(bytes, contentType, fileName);
+        }
+
+        [HttpPost]
+        public IActionResult ToggleStatus([FromBody] StudentStatusToggleRequest req)
+        {
+            var res = _studentService.ToggleStudentStatus(req, GetUserId());
+            return Json(new { success = res.Success, message = res.Message });
+        }
+
+        [HttpGet]
+        public IActionResult GetByID(int id)
+        {
+            try
+            {
+                var data = _studentService.GetStudentDetails(id, GetCompanyId(), GetSessionId());
+                return Json(new { success = true, data });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error: " + ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult GetMultiClassStudents(int? classId, int? sectionId, string? searchTerm)
+        {
+            var data = _studentService.GetMultiClassStudents(GetCompanyId(), GetSessionId(), classId, sectionId, searchTerm);
+            return Json(new { success = true, data });
+        }
+
+        [HttpPost]
+        public IActionResult UpsertMultiClass([FromBody] StudentMultiClassUpsertRequest req)
+        {
+            var res = _studentService.UpsertStudentMultiClass(req, GetCompanyId(), GetSessionId(), GetUserId());
+            return Json(new { success = res.Success, message = res.Message });
+        }
+
+        [HttpPost]
+        public IActionResult DeleteMultiClass(int id)
+        {
+            var res = _studentService.DeleteStudentMultiClass(id, GetUserId());
+            return Json(new { success = res.Success, message = res.Message });
+        }
+
+        [HttpGet]
+        public IActionResult GetClasses()
+        {
+            var data = _classService.GetAllClasses(GetCompanyId(), GetSessionId());
+            return Json(new { success = true, data });
+        }
+
+        [HttpGet]
+        public IActionResult GetSectionsByClass(int id)
+        {
+            var data = _sectionService.GetSectionsByClass(id);
+            return Json(new { success = true, data });
+        }
+
+        #endregion
     }
 }

@@ -152,8 +152,8 @@
             console.log('Fetching system fields...');
             // Try plural form first (students/staff)
             let [stdRes, stfRes] = await Promise.all([
-                fetch('/api/SettingsApi/fields?belongsTo=students&isSystemField=true').then(r => r.json()),
-                fetch('/api/SettingsApi/fields?belongsTo=staff&isSystemField=true').then(r => r.json())
+                fetch('/Settings/GetAllFields?belongsTo=students&isSystemField=true').then(r => r.json()),
+                fetch('/Settings/GetAllFields?belongsTo=staff&isSystemField=true').then(r => r.json())
             ]);
 
             console.log('Student fields response:', stdRes);
@@ -162,7 +162,7 @@
             // If plural returns nothing, try singular
             if (stdRes.success && (!stdRes.data || stdRes.data.length === 0)) {
                 console.log('Plural "students" returned no data, trying "student"...');
-                stdRes = await fetch('/api/SettingsApi/fields?belongsTo=student&isSystemField=true').then(r => r.json());
+                stdRes = await fetch('/Settings/GetAllFields?belongsTo=student&isSystemField=true').then(r => r.json());
                 console.log('Singular "student" response:', stdRes);
             }
 
@@ -182,7 +182,7 @@
 
     async function loadCurrentSettings() {
         try {
-            const res = await (await fetch('/api/SettingsApi/id-autogen/settings')).json();
+            const res = await (await fetch('/Settings/GetIDAutoGenSettings')).json();
             if (res.success && res.data) {
                 res.data.forEach(s => {
                     if (s.entityType === 'Student') {
@@ -254,11 +254,11 @@
 
         try {
             const [res1, res2] = await Promise.all([
-                fetch('/api/SettingsApi/id-autogen/save', {
+                fetch('/Settings/SaveIDAutoGenSettings', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(studentData)
                 }).then(r => r.json()),
-                fetch('/api/SettingsApi/id-autogen/save', {
+                fetch('/Settings/SaveIDAutoGenSettings', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(staffData)
                 }).then(r => r.json())

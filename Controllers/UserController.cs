@@ -170,5 +170,46 @@ namespace SchoolERP.Net.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+
+        #region User API Proxy Endpoints
+
+        [HttpGet]
+        public async Task<IActionResult> CheckUsername(string username, int userId = 0)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+                return Json(new { success = false, message = "Username is required" });
+
+            var response = await _userClient.IsUsernameUniqueAsync(username, userId);
+            return Json(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUserRoles(int userId)
+        {
+            var response = await _userClient.GetUserRoleIdsAsync(userId);
+            return Json(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetWizardData(int userId = 0, string roleIds = "")
+        {
+            var response = await _userClient.GetUserWizardDataAsync(userId, roleIds);
+            return Json(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveWizard([FromBody] UserUpsertRequest request)
+        {
+            var isCreate = request.UserID <= 0;
+            if (isCreate && !_menuPerm.Has(User, MenuPath, "Add"))
+                return Json(new { success = false, message = "You do not have permission to add users." });
+            if (!isCreate && !_menuPerm.Has(User, MenuPath, "Edit"))
+                return Json(new { success = false, message = "You do not have permission to edit users." });
+
+            var response = await _userClient.SaveUserWizardAsync(request);
+            return Json(response);
+        }
+
+        #endregion
     }
 }

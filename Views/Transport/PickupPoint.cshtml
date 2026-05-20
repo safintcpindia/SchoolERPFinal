@@ -317,7 +317,7 @@
 
     function editSelected() {
         if (!selectedId) return;
-        fetch(`/api/PickupPointApi/GetPickupPointByID/${selectedId}`)
+        fetch(`/Transport/GetPickupPointByID/${selectedId}`)
             .then(r => r.json())
             .then(res => {
                 if (!res.success) { showToast(res.message, 'danger'); return; }
@@ -353,7 +353,7 @@
             isActive: document.getElementById('chkActive').checked
         };
 
-        fetch('/api/PickupPointApi/UpsertPickupPoint', {
+        fetch('/Transport/UpsertPickupPoint', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -371,7 +371,7 @@
     function deleteSelected() {
         if (!selectedId) return;
         if (!confirm('Are you sure you want to delete this record?')) return;
-        fetch(`/api/PickupPointApi/DeletePickupPoint/${selectedId}`, { method: 'POST' })
+        fetch(`/Transport/DeletePickupPoint/${selectedId}`, { method: 'POST' })
             .then(r => r.json())
             .then(res => {
                 showToast(res.message, res.success ? 'success' : 'danger');
@@ -380,7 +380,7 @@
     }
 
     function toggleStatus(id, isActive) {
-        fetch(`/api/PickupPointApi/TogglePickupPointStatus?id=${id}&isActive=${isActive}`, { method: 'POST' })
+        fetch(`/Transport/TogglePickupPointStatus?id=${id}&isActive=${isActive}`, { method: 'POST' })
             .then(r => r.json())
             .then(res => showToast(res.message, res.success ? 'success' : 'danger'));
     }

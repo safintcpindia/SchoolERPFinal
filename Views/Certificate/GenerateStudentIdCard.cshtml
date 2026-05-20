@@ -1,7 +1,23 @@
+@using System.Security.Claims
+@using SchoolERP.Net.Helpers
+@inject PermissionHelper PermHelper
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Generate Student ID Card";
+    int currentUserId = 0;
+    if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        var idClaim = User.FindFirst(ClaimTypes.NameIdentifier) ?? User.FindFirst("UserId");
+        if (idClaim != null) int.TryParse(idClaim.Value, out currentUserId);
+    }
+    if (currentUserId > 0) PermHelper.LoadPermissions(currentUserId);
+    
+    var canExport = PermHelper.HasPermissionByUrl("/Certificate/GenerateStudentIdCard", "Export");
 }
+
+<style>
+.dt-buttons { display: none !important; }
+</style>
 
 <div class="d-flex align-items-sm-center justify-content-between flex-wrap gap-2 mb-2">
     <div>
@@ -11,6 +27,20 @@
         <button type="button" class="btn btn-secondary" onclick="generateSelectedIDCards()">
             <i class="ti ti-printer me-1"></i> Generate & Print
         </button>
+        @if (canExport)
+        {
+            <div class="dropdown d-inline-flex">
+                <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="ti ti-download me-1"></i>Export
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(0)"><i class="ti ti-copy me-1"></i>Copy</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(1)"><i class="ti ti-file-text me-1"></i>CSV</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(2)"><i class="ti ti-file-spreadsheet me-1"></i>Excel</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(3)"><i class="ti ti-file-description me-1"></i>PDF</a></li>
+                </ul>
+            </div>
+        }
     </div>
 </div>
 
@@ -61,12 +91,7 @@
                     </tr>
                 </thead>
                 <tbody id="genStudentList">
-                    <tr>
-                        <td colspan="6" class="text-center py-5 text-muted">
-                            <i class="ti ti-search fs-1 d-block mb-2"></i>
-                            Please select filters and search to see students.
-                        </td>
-                    </tr>
+                    
                 </tbody>
             </table>
         </div>
@@ -75,8 +100,36 @@
 
 @section Scripts {
     <script>
+
+        function triggerExport(index) {
+        if ($.fn.DataTable.isDataTable('#genStudentTable')) {
+                const table = $('#genStudentTable').DataTable();
+            table.button(index).trigger();
+        }
+    }
+
+$(document).ready(function () {
+            $('#genStudentTable').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                { extend: 'copy', exportOptions: { columns: [1, 2, 3, 4, 5] } },
+                    { extend: 'csv', exportOptions: { columns: [1, 2, 3, 4, 5] } },
+                    { extend: 'excel', exportOptions: { columns: [1, 2, 3, 4, 5] } },
+                    { extend: 'pdf', exportOptions: { columns: [1, 2, 3, 4, 5] } },
+                    { extend: 'print', exportOptions: { columns: [1, 2, 3, 4, 5] } }
+            ],
+            searching: false,
+            paging: false,
+            info: false,
+                language: {
+                    emptyTable: "Please select filters and search to see students."
+                }
+        });
+})
+
+
         window.loadClassesForGen = function () {
-            $.get('/api/ClassApi/GetAll', function (resp) {
+            $.get('/Certificate/GetAllClasses', function (resp) {
                 if (resp.success) {
                     var html = '<option value="">Select Class</option>';
                     resp.data.forEach(function(item) {
@@ -92,7 +145,7 @@
                 $('#genSectionId').html('<option value="">Select Section</option>').trigger('change');
                 return;
             }
-            $.get('/api/SectionApi/GetByClass/' + classId, function (resp) {
+            $.get('/Certificate/GetSectionsByClass?classId=' + classId, function (resp) {
                 if (resp.success) {
                     var html = '<option value="">Select Section</option>';
                     resp.data.forEach(function(item) {
@@ -104,7 +157,7 @@
         };
 
         window.loadTemplatesForGen = function () {
-            $.get('/api/StudentIDCardApi/GetAll', function (resp) {
+            $.get('/Certificate/GetAllStudentIDCards', function (resp) {
                 if (resp.success) {
                     var html = '<option value="">Select Template</option>';
                     resp.data.forEach(function(item) {
@@ -122,12 +175,12 @@
             var sectionId = $('#genSectionId').val();
             if (!classId) { alert('Please select a class.'); return; }
 
-            $('#genStudentList').html('<tr><td colspan="6" class="text-center py-5"><span class="spinner-border spinner-border-sm me-2"></span>Searching students...</td></tr>');
-            $.get('/api/StudentInformationApi/GetStudentList', { classId: classId, sectionId: sectionId }, function (resp) {
+            
+            $.get('/Certificate/GetStudentList', { classId: classId, sectionId: sectionId }, function (resp) {
                 if (resp.success) {
                     var html = '';
                     if (resp.data.length === 0) {
-                        html = '<tr><td colspan="6" class="text-center py-5 text-muted">No students found.</td></tr>';
+                        html = '';
                     } else {
                         resp.data.forEach(function(item) {
                             html += '<tr>' +
@@ -159,7 +212,7 @@
             $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Generating...');
 
             try {
-                var tResp = await $.get('/api/StudentIDCardApi/GetByID/' + templateId);
+                var tResp = await $.get('/Certificate/GetStudentIDCardByID?id=' + templateId);
                 if (!tResp.success || !tResp.data) {
                     alert('Failed to load template.');
                     return;
@@ -169,7 +222,7 @@
                 var fullHtml = '<div class="id-card-print-container">';
                 
                 for (var i = 0; i < sIds.length; i++) {
-                    var sResp = await $.get('/api/StudentInformationApi/GetByID/' + sIds[i]);
+                    var sResp = await $.get('/Certificate/GetStudentByID?id=' + sIds[i]);
                     if (sResp.success) {
                         fullHtml += createIDCardHtml(sResp.data, template);
                     }

@@ -780,7 +780,7 @@
             const staffId = @Model.StaffID;
             const year = $('#att_yearSelect').val() || new Date().getFullYear();
             console.log("Fetching attendance for staff:", staffId, "year:", year);
-            fetch(`/api/HumanResourceApi/GetStaffAttendanceHistory/${staffId}/${year}`)
+            fetch(`/HumanResource/GetStaffAttendanceHistory/${staffId}/${year}`)
                 .then(r => r.json())
                 .then(res => {
                     console.log("Attendance API Response:", res);
@@ -882,7 +882,7 @@
         function fetchStaffTimeline() {
             const staffId = @Model.StaffID;
             console.log("Fetching timeline for staff:", staffId);
-            fetch(`/api/HumanResourceApi/GetStaffTimeline/${staffId}`)
+            fetch(`/HumanResource/GetStaffTimeline/${staffId}`)
                 .then(r => r.json())
                 .then(res => {
                     console.log("Timeline API Response:", res);
@@ -929,8 +929,8 @@
                             <div class="text-end">
                                 <span class="badge bg-light text-dark d-block mb-1">${date}</span>
                                 ${docName ? `
-                                <a href="/api/HumanResourceApi/DownloadTimelineDoc/${id}" class="text-primary small" onclick="event.stopPropagation()">
-                                    <i class="ti ti-download"></i> Doc
+                                <a href="/HumanResource/DownloadTimelineDoc/${id}" class="text-primary small" onclick="event.stopPropagation()">
+                                    <i class="ti ti-download me-1"></i>Download Document
                                 </a>` : '<span class="text-muted small italic">No Doc</span>'}
                             </div>
                         </div>
@@ -955,7 +955,7 @@
             $('#timelineForm').removeClass('was-validated');
             // In a real app, you'd fetch by ID or get from cached list
             // For now, let's fetch to be safe
-            fetch(`/api/HumanResourceApi/GetStaffTimeline/${@Model.StaffID}`)
+            fetch(`/HumanResource/GetStaffTimeline/${@Model.StaffID}`)
                 .then(r => r.json())
                 .then(res => {
                     const item = res.data.find(x => (x.timelineID || x.TimelineID) == id);
@@ -995,7 +995,7 @@
                     AttachDocType: fileType
                 };
 
-                fetch('/api/HumanResourceApi/UpsertTimeline', {
+                fetch('/HumanResource/UpsertTimeline', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -1026,7 +1026,7 @@
         function deleteTimeline(id) {
             if (!confirm('Are you sure you want to delete this timeline?')) return;
 
-            fetch(`/api/HumanResourceApi/DeleteTimeline/${id}`, { method: 'DELETE' })
+            fetch(`/HumanResource/DeleteTimeline/${id}`, { method: 'DELETE' })
                 .then(r => r.json())
                 .then(res => {
                     if (res.success) fetchStaffTimeline();
@@ -1066,7 +1066,7 @@
                 statusDate: statusDate
             };
 
-            fetch('/api/HumanResourceApi/ToggleStaffStatus', {
+            fetch('/HumanResource/ToggleStaffStatus', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
@@ -1088,7 +1088,7 @@
         function fetchStaffPayroll() {
             const staffId = @Model.StaffID;
             console.log("Fetching payroll for staff:", staffId);
-            fetch(`/api/HumanResourceApi/GetStaffPayroll/${staffId}`)
+            fetch(`/HumanResource/GetStaffPayroll/${staffId}`)
                 .then(r => r.json())
                 .then(res => {
                     console.log("Payroll API Response:", res);
@@ -1107,7 +1107,7 @@
         function fetchStaffLeaves() {
             const staffId = @Model.StaffID;
             console.log("Fetching leaves for staff:", staffId);
-            fetch(`/api/HumanResourceApi/GetStaffLeaves/${staffId}`)
+            fetch(`/HumanResource/GetStaffLeaves/${staffId}`)
                 .then(r => r.json())
                 .then(res => {
                     console.log("Leaves API Response:", res);
@@ -1231,7 +1231,7 @@
         }
 
         function fetchSidebarStaff() {
-            fetch('/api/HumanResourceApi/GetAllStaff')
+            fetch('/HumanResource/GetAllStaff')
                 .then(r => r.json())
                 .then(res => {
                     if (res.success) {
@@ -1326,7 +1326,7 @@
                 NewPassword: newPwd
             };
 
-            fetch('/api/HumanResourceApi/ChangeStaffPassword', {
+            fetch('/HumanResource/ChangeStaffPassword', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

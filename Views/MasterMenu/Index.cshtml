@@ -126,14 +126,14 @@
         }
         @if (canPrint)
         {
-            <button class="btn btn-dark d-inline-flex align-items-center shadow-sm" onclick="triggerExport('print')">
+            <button class="btn btn-secondary d-inline-flex align-items-center shadow-sm" onclick="triggerExport('print')">
                 <i class="ti ti-printer me-1"></i> Print
             </button>
         }
         @if (canExport)
         {
             <div class="dropdown d-inline-block">
-                <button class="btn btn-secondary dropdown-toggle d-inline-flex align-items-center shadow-sm" type="button" data-bs-toggle="dropdown">
+                <button class="btn btn-warning dropdown-toggle d-inline-flex align-items-center shadow-sm" type="button" data-bs-toggle="dropdown">
                     <i class="ti ti-download me-1"></i> Export
                 </button>
                 <ul class="dropdown-menu">

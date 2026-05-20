@@ -55,5 +55,15 @@ namespace SchoolERP.Net.Services.Clients
         {
             return await PostAsync<bool>("api/SettingsApi/fields/toggle-status", new { id, isActive });
         }
+
+        public async Task<ApiResponse<List<IDAutoGenSettings>>> GetIDAutoGenSettingsAsync()
+        {
+            return await GetAsync<List<IDAutoGenSettings>>("api/SettingsApi/id-autogen/settings");
+        }
+
+        public async Task<ApiResponse<bool>> SaveIDAutoGenSettingsAsync(IDAutoGenRequest req)
+        {
+            return await PostAsync<bool>("api/SettingsApi/id-autogen/save", req);
+        }
     }
 }

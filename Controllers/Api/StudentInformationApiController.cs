@@ -8,6 +8,7 @@ namespace SchoolERP.Net.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Microsoft.AspNetCore.Authorization.Authorize]
     /// <summary>
     /// This is a technical 'API' controller that provides data to the website.
     /// It handles background requests like getting student lists, updating statuses, 

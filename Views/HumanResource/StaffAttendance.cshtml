@@ -161,7 +161,7 @@
         $('#attendanceBody').html(`<tr><td colspan="8" class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary"></div> Loading...</td></tr>`);
 
         try {
-            const response = await fetch(`/api/HumanResourceApi/GetStaffAttendance?date=${date}&roleId=${roleId || ''}`);
+            const response = await fetch(`/HumanResource/GetStaffAttendance?date=${date}&roleId=${roleId || ''}`);
             const res = await response.json();
 
             if (res.success) {
@@ -349,7 +349,7 @@
         }
 
         try {
-            const response = await fetch('/api/HumanResourceApi/SaveStaffAttendance', {
+            const response = await fetch('/HumanResource/SaveStaffAttendance', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)

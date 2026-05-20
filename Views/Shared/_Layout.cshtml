@@ -56,8 +56,12 @@
     <link rel="stylesheet" href="~/assets/plugins/choices.js/public/assets/styles/choices.min.css">
 
 
+    <!-- DataTable CSS -->
+    <link rel="stylesheet" href="~/assets/css/jquery.dataTables.min.css" />
 
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/assets/css/buttons.dataTables.min.css" />
+
+    <link href="~/assets/css/select2.min.css" rel="stylesheet" />
 
 
     <!-- Main CSS -->
@@ -676,7 +680,7 @@
     <script src="~/assets/js/form-fileupload.js"></script>
 
     <!-- Editor JS -->
-    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>    
+    <script src="~/js/ckeditor.js"></script>    
    
 
     <!-- Daterangepikcer JS -->
@@ -689,33 +693,27 @@
     <script src="~/assets/plugins/sweetalert2/sweetalert2.all.min.js"></script>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="~/js/select2.min.js"></script>
 
-    <!-- DataTable CSS -->
-    <link rel="stylesheet"
-          href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
-
-    <link rel="stylesheet"
-          href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
 
 
     <!-- DataTable Core -->
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="~/js/jquery.dataTables.min.js"></script>
 
     <!-- Buttons -->
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="~/js/dataTables.buttons.min.js"></script>
 
     <!-- Export Dependencies -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="~/js/jszip.min.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="~/js/pdfmake.min.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="~/js/vfs_fonts.js"></script>
 
     <!-- Export Buttons -->
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="~/js/buttons.html5.min.js"></script>
 
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script src="~/js/buttons.print.min.js"></script>
 
     <script>
         const input = document.getElementById("txtBackDaysAllow");
@@ -780,7 +778,7 @@
             if (!ddl || !titleEl || !btnSave) return;
 
             async function fetchSessions() {
-                const resp = await fetch('/api/SessionApi/GetAll?includeDeleted=false', { method: 'GET' });
+                const resp = await fetch('/Sessions/GetAll?includeDeleted=false', { method: 'GET' });
                 const payload = await resp.json();
                 if (!payload || payload.success !== true || !Array.isArray(payload.data)) {
                     throw new Error(payload?.message || 'Failed to load sessions');
@@ -790,7 +788,7 @@
 
             async function fetchUserCurrentSession() {
                 try {
-                    const resp = await fetch('/api/SessionApi/GetUserCurrentSession', { method: 'GET' });
+                    const resp = await fetch('/Sessions/GetUserCurrentSession', { method: 'GET' });
                     const payload = await resp.json();
                     return payload.success ? (payload.data || 0) : 0;
                 } catch {
@@ -887,7 +885,7 @@
             if (!ddl || !titleEl || !btnSave) return;
 
             async function fetchCompanies() {
-                const resp = await fetch('/api/CompanyApi/GetAssignedCompanies', { method: 'GET' });
+                const resp = await fetch('/Company/GetAssignedCompanies', { method: 'GET' });
                 const payload = await resp.json();
                 if (!payload || payload.success !== true || !Array.isArray(payload.data)) {
                     throw new Error(payload?.message || 'Failed to load companies');
@@ -897,7 +895,7 @@
 
             async function fetchUserCurrentCompany() {
                 try {
-                    const resp = await fetch('/api/CompanyApi/GetUserCurrentCompany', { method: 'GET' });
+                    const resp = await fetch('/Company/GetUserCurrentCompany', { method: 'GET' });
                     const payload = await resp.json();
                     return payload.success ? (payload.data || 0) : 0;
                 } catch {

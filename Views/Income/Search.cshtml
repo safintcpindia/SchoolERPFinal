@@ -2,12 +2,59 @@
 @{
     ViewData["Title"] = "Search " + Model.EntryType;
 }
+@inject PermissionHelper PermHelper
+@{
+    
+    int currentUserId = 0;
+    if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        var idClaim = User.FindFirst(ClaimTypes.NameIdentifier) ?? User.FindFirst("UserId");
+        if (idClaim != null) int.TryParse(idClaim.Value, out currentUserId);
+    }
+    if (currentUserId > 0) PermHelper.LoadPermissions(currentUserId);
+
+    var canAdd = PermHelper.HasPermissionByUrl("/Income/Search", "Add");
+    var canEdit = PermHelper.HasPermissionByUrl("/Income/Search", "Edit");
+    var canDelete = PermHelper.HasPermissionByUrl("/Income/Search", "Delete");
+    var canPrint = PermHelper.HasPermissionByUrl("/Income/Search", "Print");
+    var canExport = PermHelper.HasPermissionByUrl("/Income/Search", "Export");
+
+}
+<style>
+    .dt-buttons {
+        display: none !important;
+    }
+</style>
 
 <!-- Page Header -->
 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
     <div>
         <h6 class="fw-bold mb-0">Search @Model.EntryType</h6>
     </div>
+    <div class="d-flex align-items-center flex-wrap gap-1">
+         @if (canPrint)
+        {
+            <button class="btn btn-secondary d-inline-flex align-items-center" onclick="triggerExport(4)">
+                <i class="ti ti-printer me-1"></i>Print
+            </button>
+        }
+        @if (canExport)
+        {
+            <div class="dropdown d-inline-flex">
+                <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="ti ti-download me-1"></i>Export
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(0)"><i class="ti ti-copy me-1"></i>Copy</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(1)"><i class="ti ti-file-text me-1"></i>CSV</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(2)"><i class="ti ti-file-spreadsheet me-1"></i>Excel</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(3)"><i class="ti ti-file-description me-1"></i>PDF</a></li>
+                </ul>
+            </div>
+        } 
+
+    </div>
+
 </div>
 
 <div class="row">
@@ -143,12 +190,7 @@
                                     <td class="text-end pe-3">@item.Amount.ToString("N2")</td>
                                 </tr>
                             }
-                            @if (!Model.Results.Any())
-                            {
-                                <tr class="no-records">
-                                    <td colspan="5" class="text-center py-4 text-danger">No records found.</td>
-                                </tr>
-                            }
+                           
                         </tbody>
                         @if (Model.Results.Any())
                         {
@@ -168,6 +210,34 @@
 
 @section Scripts {
     <script>
+
+        function triggerExport(index) {
+            if ($.fn.DataTable.isDataTable('#resultsTable')) {
+                const table = $('#resultsTable').DataTable();
+            table.button(index).trigger();
+        }
+    }
+
+$(document).ready(function () {
+            $('#resultsTable').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                { extend: 'copy', exportOptions: { columns: [0,1, 2, 3, 4] } },
+                    { extend: 'csv', exportOptions: { columns: [0, 1, 2, 3, 4] } },
+                    { extend: 'excel', exportOptions: { columns: [0, 1, 2, 3, 4] } },
+                    { extend: 'pdf', exportOptions: { columns: [0, 1, 2, 3, 4] } },
+                    { extend: 'print', exportOptions: { columns: [0, 1, 2, 3, 4] } }
+            ],
+            searching: false,
+            paging: false,
+            info: false,
+                language: {
+                    emptyTable: "No records found."
+                }
+        });
+})
+
+
         function showdate(val) {
             if (val === 'period') {
                 $('#date_result').css('display', 'flex');
@@ -175,6 +245,7 @@
                 $('#date_result').hide();
             }
         }
+
 
         document.getElementById('txtSearchInput').addEventListener('keyup', function() {
             const q = this.value.toLowerCase();

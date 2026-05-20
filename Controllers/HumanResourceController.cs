@@ -27,6 +27,13 @@ namespace SchoolERP.Net.Controllers
         private readonly ISettingsClientService _settingsClient;
         private readonly ICompanyService _companySvc;
         private readonly ISessionService _sessionSvc;
+        private readonly IUserMenuPermissionService _menuPerm;
+        private readonly IUserService _userService;
+
+        private const string DesignationMenuPath = "/HumanResource/Designation";
+        private const string DepartmentMenuPath = "/HumanResource/Department";
+        private const string LeaveTypeMenuPath = "/HumanResource/LeaveType";
+        private const string StaffMenuPath = "/HumanResource/Staffs";
 
         public HumanResourceController(
             IHumanResourceClientService hrClient,
@@ -36,7 +43,9 @@ namespace SchoolERP.Net.Controllers
             IHumanResourceService hrService,
             ISettingsClientService settingsClient,
             ICompanyService companySvc,
-            ISessionService sessionSvc)
+            ISessionService sessionSvc,
+            IUserMenuPermissionService menuPerm,
+            IUserService userService)
         {
             _hrClient = hrClient;
             _roleClient = roleClient;
@@ -46,6 +55,8 @@ namespace SchoolERP.Net.Controllers
             _settingsClient = settingsClient;
             _companySvc = companySvc;
             _sessionSvc = sessionSvc;
+            _menuPerm = menuPerm;
+            _userService = userService;
         }
 
         private int GetUserId() => int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("UserId"), out var id) ? id : 0;

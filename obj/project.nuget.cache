@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "kUUfkEWn7NbJH43w3Cdcv6tFiFx+TJDJegR2T0TTNPY3a5xFLH6BDlKlkatHqdBUBHPUitCQyhoOM8WZBS8COA==",
+  "dgSpecHash": "Ny5eO3cnIYzL+n0q5T0K2wH4gNHF5la70BHOj19PFbqL/EBC3ItF8X9bhQCKvPmzdw+QeXa9dt9niPL+Kn/b5Q==",
   "success": true,
-  "projectFilePath": "C:\\Users\\DELL\\Downloads\\SchoolERP 19-5-2026\\SchoolERP.Net.csproj",
+  "projectFilePath": "C:\\Users\\DELL\\Downloads\\SchoolERP 20-5-2026\\SchoolERP.Net.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\DELL\\.nuget\\packages\\humanizer\\2.14.1\\humanizer.2.14.1.nupkg.sha512",
     "C:\\Users\\DELL\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",

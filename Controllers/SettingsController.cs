@@ -572,5 +572,76 @@ namespace SchoolERP.Net.Controllers
             var response = await _userClient.DeleteUserAsync(id);
             return Json(new { success = response.Success, message = response.Message });
         }
+
+        #region Settings Fields & IDAutoGen API Proxy Endpoints
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllFields(bool? isSystemField = null, string belongsTo = null)
+        {
+            var res = await _settingsClient.GetAllFieldsAsync(isSystemField, belongsTo);
+            return Json(res);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetFieldByID(int id)
+        {
+            var res = await _settingsClient.GetFieldByIDAsync(id);
+            return Json(res);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpsertField([FromBody] FieldViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return Json(new { success = false, message = "Invalid model state" });
+
+            var isCreate = model.FieldId <= 0;
+            if (isCreate && !_menuPerm.Has(User, SettingsMenuPath, "Add"))
+                return Json(new { success = false, message = "You do not have permission to add fields." });
+            if (!isCreate && !_menuPerm.Has(User, SettingsMenuPath, "Edit"))
+                return Json(new { success = false, message = "You do not have permission to edit fields." });
+
+            var res = await _settingsClient.UpsertFieldAsync(model);
+            return Json(res);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteField(int id)
+        {
+            if (!_menuPerm.Has(User, SettingsMenuPath, "Delete"))
+                return Json(new { success = false, message = "You do not have permission to delete fields." });
+
+            var res = await _settingsClient.DeleteFieldAsync(id);
+            return Json(res);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleFieldStatus([FromBody] FieldToggleStatusRequest request)
+        {
+            if (!_menuPerm.Has(User, SettingsMenuPath, "Edit"))
+                return Json(new { success = false, message = "You do not have permission to change field status." });
+
+            var res = await _settingsClient.ToggleFieldStatusAsync(request.Id, request.IsActive);
+            return Json(res);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetIDAutoGenSettings()
+        {
+            var res = await _settingsClient.GetIDAutoGenSettingsAsync();
+            return Json(res);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveIDAutoGenSettings([FromBody] IDAutoGenRequest request)
+        {
+            if (!_menuPerm.Has(User, SettingsMenuPath, "Edit"))
+                return Json(new { success = false, message = "You do not have permission to change ID auto-generation settings." });
+
+            var res = await _settingsClient.SaveIDAutoGenSettingsAsync(request);
+            return Json(res);
+        }
+
+        #endregion
     }
 }

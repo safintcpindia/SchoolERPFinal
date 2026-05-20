@@ -86,5 +86,20 @@ namespace SchoolERP.Net.Services.Clients
         {
             return await PostAsync<bool>($"api/user/delete/{id}", null);
         }
+
+        public async Task<ApiResponse<bool>> IsUsernameUniqueAsync(string username, int userId = 0)
+        {
+            return await GetAsync<bool>($"api/user/check-username?username={System.Uri.EscapeDataString(username)}&userId={userId}");
+        }
+
+        public async Task<ApiResponse<UserWizardViewModel>> GetUserWizardDataAsync(int userId = 0, string roleIds = "")
+        {
+            return await GetAsync<UserWizardViewModel>($"api/user/wizard-data?userId={userId}&roleIds={roleIds}");
+        }
+
+        public async Task<ApiResponse<bool>> SaveUserWizardAsync(UserUpsertRequest request)
+        {
+            return await PostAsync<bool>("api/user/save-wizard", request);
+        }
     }
 }

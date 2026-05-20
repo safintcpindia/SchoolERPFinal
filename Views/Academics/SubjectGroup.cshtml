@@ -24,6 +24,8 @@
     var canAdd = PermHelper.HasPermissionByUrl("/Academics/SubjectGroup", "Add");
     var canEdit = PermHelper.HasPermissionByUrl("/Academics/SubjectGroup", "Edit");
     var canDelete = PermHelper.HasPermissionByUrl("/Academics/SubjectGroup", "Delete");
+    var canPrint = PermHelper.HasPermissionByUrl("/Academics/SubjectGroup", "Print");
+    var canExport = PermHelper.HasPermissionByUrl("/Academics/SubjectGroup", "Export");
 }
 
 <!-- Page Header -->
@@ -49,6 +51,26 @@
             <button id="btnDelete" class="btn btn-danger" disabled onclick="deleteSelected()">
                 <i class="ti ti-trash me-1"></i>Delete
             </button>
+        }
+        @if (canPrint)
+        {
+            <button class="btn btn-secondary d-inline-flex align-items-center" onclick="triggerExport(4)">
+                <i class="ti ti-printer me-1"></i>Print
+            </button>
+        }
+        @if (canExport)
+        {
+            <div class="dropdown d-inline-flex">
+                <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="ti ti-download me-1"></i>Export
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(0)"><i class="ti ti-copy me-1"></i>Copy</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(1)"><i class="ti ti-file-text me-1"></i>CSV</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(2)"><i class="ti ti-file-spreadsheet me-1"></i>Excel</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(3)"><i class="ti ti-file-description me-1"></i>PDF</a></li>
+                </ul>
+            </div>
         }
     </div>
 </div>
@@ -128,8 +150,9 @@
                                 <th>Name</th>
                                 <th>Class (Sections)</th>
                                 <th>Subjects</th>
-                                <th>Status</th>
+                                
                                 <th>Created On</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -155,6 +178,7 @@
                                                 }
                                             }
                                         </td>
+                                        <td>@g.CreatedOn.ToString("dd MMM yyyy")</td>
                                         <td>
                                             @if (canEdit)
                                             {
@@ -167,7 +191,7 @@
                                                 <span class="badge @(g.IsActive ? "bg-success" : "bg-secondary")">@(g.IsActive ? "Active" : "Inactive")</span>
                                             }
                                         </td>
-                                        <td>@g.CreatedOn.ToString("dd MMM yyyy")</td>
+                                       
                                     </tr>
                                 }
                             }
@@ -259,6 +283,7 @@
 @section Styles {
     <!--<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />-->
     <style>
+        .dt-buttons { display: none !important; }
         .select2-container--default .select2-selection--multiple {
             padding-bottom: 0px; 
             margin-top: 0px; 
@@ -271,6 +296,13 @@
 @section Scripts {
     <!--<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>-->
     <script>
+        function triggerExport(index) {
+            if ($.fn.DataTable.isDataTable('#groupsTable')) {
+                const table = $('#groupsTable').DataTable();
+                table.button(index).trigger();
+            }
+        }
+
         const permCanAdd = @Html.Raw(JsonSerializer.Serialize(canAdd));
         const permCanEdit = @Html.Raw(JsonSerializer.Serialize(canEdit));
         const permCanDelete = @Html.Raw(JsonSerializer.Serialize(canDelete));
@@ -278,8 +310,8 @@
 
         const IV = {
             clearMap: (map) => Object.keys(map).forEach(k => { 
-                document.getElementById(k)?.classList.remove('is-invalid');
-                const err = document.getElementById(map[k]); if(err) err.textContent = '';
+            document.getElementById(k)?.classList.remove('is-invalid');
+            const err = document.getElementById(map[k]); if(err) err.textContent = '';
             }),
             setFieldError: (id, errId, msg) => {
                 document.getElementById(id)?.classList.add('is-invalid');
@@ -301,6 +333,41 @@
         let selectedId = 0;
 
         $(document).ready(function() {
+            const exportOpts = {
+                columns: [1, 2, 3, 4, 5],
+                format: {
+                    body: function (data, row, column, node) {
+                        const checkbox = node.querySelector('input.status-switch');
+                        if (checkbox) {
+                            return checkbox.checked ? 'Active' : 'Inactive';
+                        }
+                        if (node.querySelectorAll('.badge').length > 0) {
+                            return Array.from(node.querySelectorAll('.badge')).map(b => b.textContent.trim()).join(', ');
+                        }
+                        const badge = node.querySelector('.badge');
+                        if (badge) {
+                            return badge.textContent.trim();
+                        }
+                        // Remove br or small-spaced sections and strip tags
+                        return data.replace(/<br\s*\/?>/gi, " ").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+                    }
+                }
+            };
+
+            $('#groupsTable').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    { extend: 'copy', exportOptions: exportOpts },
+                    { extend: 'csv', exportOptions: exportOpts },
+                    { extend: 'excel', exportOptions: exportOpts },
+                    { extend: 'pdf', exportOptions: exportOpts },
+                    { extend: 'print', exportOptions: exportOpts }
+                ],
+                searching: false,
+                paging: false,
+                info: false
+            });
+
             $('.select2').each(function() {
                 const parent = $(this).closest('.modal').length ? $(this).closest('.modal') : $(this).closest('.dropdown-menu');
                 $(this).select2({

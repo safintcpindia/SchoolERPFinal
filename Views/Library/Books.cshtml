@@ -1,7 +1,25 @@
-
+@model SchoolERP.Net.Models.HRDepartmentPageViewModel
+@using System.Security.Claims
+@using SchoolERP.Net.Helpers
+@inject PermissionHelper PermHelper
 @{
     ViewData["Title"] = "Library Books";
+    int currentUserId = 0;
+    if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        var idClaim = User.FindFirst(ClaimTypes.NameIdentifier) ?? User.FindFirst("UserId");
+        if (idClaim != null) int.TryParse(idClaim.Value, out currentUserId);
+    }
+    if (currentUserId > 0) PermHelper.LoadPermissions(currentUserId);
+
+    var canPrint = PermHelper.HasPermissionByUrl("/Library/Books", "Print");
+    var canExport = PermHelper.HasPermissionByUrl("/Library/Books", "Export");
 }
+<style>
+    .dt-buttons {
+        display: none !important;
+    }
+</style>
 
 <!-- Page Header -->
 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
@@ -18,9 +36,27 @@
         <button id="btnDelete" class="btn btn-danger d-inline-flex align-items-center" disabled onclick="deleteSelected()">
             <i class="ti ti-trash me-1"></i>Delete
         </button>
-        <a href="javascript:window.print();" class="btn btn-secondary d-inline-flex align-items-center">
-            <i class="ti ti-printer me-1"></i>Print
-        </a>
+        @if (canPrint)
+        {
+            <button class="btn btn-secondary d-inline-flex align-items-center" onclick="triggerExport(4)">
+                <i class="ti ti-printer me-1"></i>Print
+            </button>
+        }
+        @if (canExport)
+        {
+            <div class="dropdown d-inline-flex">
+                <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="ti ti-download me-1"></i>Export
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(0)"><i class="ti ti-copy me-1"></i>Copy</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(1)"><i class="ti ti-file-text me-1"></i>CSV</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(2)"><i class="ti ti-file-spreadsheet me-1"></i>Excel</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(3)"><i class="ti ti-file-description me-1"></i>PDF</a></li>
+                </ul>
+            </div>
+        } 
+
     </div>
 </div>
 
@@ -63,9 +99,7 @@
                             </tr>
                         </thead>
                         <tbody id="listBody">
-                            <tr>
-                                <td colspan="11" class="text-center py-4"><div class="spinner-border text-primary"></div></td>
-                            </tr>
+                            
                         </tbody>
                     </table>
                 </div>
@@ -150,6 +184,44 @@
 @section Scripts {
     <script src="~/assets/plugins/sweetalert/sweetalert2.all.min.js"></script>
     <script>
+
+        function triggerExport(index) {
+        if ($.fn.DataTable.isDataTable('#tblBooks')) {
+                const table = $('#tblBooks').DataTable();
+            table.button(index).trigger();
+        }
+    }
+        function initializeDataTable() {
+
+            if ($.fn.DataTable.isDataTable('#tblBooks')) {
+                $('#tblBooks').DataTable().destroy();
+            }
+
+            $('#tblBooks').DataTable({
+                destroy: true,
+                dom: 'Bfrtip',
+                buttons: [
+                    { extend: 'copy', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] } },
+                    { extend: 'csv', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] } },
+                    { extend: 'excel', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] } },
+                    { extend: 'pdf', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] } },
+                    { extend: 'print', exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] } }
+                ],
+                searching: false,
+                paging: false,
+                info: false,
+                ordering: false,
+                language: {
+                    emptyTable: "No books found in catalog."
+                }
+            });
+        }
+
+$(document).ready(function () {
+           
+})
+
+
         let selectedId = 0;
 
         $(document).ready(function () {
@@ -185,10 +257,9 @@
                             </tr>
                         `;
                     });
-                } else {
-                    html = '<tr><td colspan="11" class="text-center py-4 text-muted">No books found in catalog.</td></tr>';
-                }
+                } 
                 $('#listBody').html(html);
+                initializeDataTable();
             });
         }
 
@@ -267,6 +338,7 @@
                         showToast(res.message, 'success');
                         $('#upsertModal').modal('hide');
                         loadData();
+                        initializeDataTable();
                     } else {
                         Swal.fire('Error!', res.message, 'error');
                     }
@@ -291,6 +363,7 @@
                         if (res.success) {
                             showToast(res.message, 'success');
                             loadData();
+                            initializeDataTable();
                         } else {
                             Swal.fire('Error!', res.message, 'error');
                         }
@@ -306,6 +379,7 @@
                 } else {
                     Swal.fire('Error!', res.message, 'error');
                     loadData();
+                    initializeDataTable();
                 }
             });
         }

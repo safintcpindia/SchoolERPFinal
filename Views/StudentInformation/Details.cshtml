@@ -624,7 +624,7 @@
             // Show loading state in body
             $('#att_history_body').html('<tr><td colspan="13" class="text-center py-4"><span class="spinner-border spinner-border-sm"></span> Loading...</td></tr>');
 
-            fetch(`/api/StudentInformationApi/GetStudentAttendanceHistory/${studentId}/${year}`)
+            fetch(`/StudentInformation/GetStudentAttendanceHistory/${studentId}/${year}`)
                 .then(r => r.json())
                 .then(res => {
                     console.log("Attendance API Response:", res);
@@ -698,7 +698,7 @@
 
         function fetchStudentTimeline() {
             const studentId = @Model.BasicInfo.StudentID;
-            fetch(`/api/StudentInformationApi/GetStudentTimeline/${studentId}`)
+            fetch(`/StudentInformation/GetStudentTimeline/${studentId}`)
                 .then(r => r.json())
                 .then(res => {
                     if (res.success) {
@@ -743,7 +743,7 @@
                             <div class="text-end">
                                 <span class="badge bg-light text-dark d-block mb-1">${date}</span>
                                 ${hasDoc ? `
-                                <a href="/api/StudentInformationApi/DownloadTimelineDoc/${id}" class="text-primary small" onclick="event.stopPropagation()">
+                                <a href="/StudentInformation/DownloadTimelineDoc/${id}" class="text-primary small" onclick="event.stopPropagation()">
                                     <i class="ti ti-download"></i> Doc
                                 </a>` : '<span class="text-muted small italic">No Doc</span>'}
                             </div>
@@ -825,7 +825,7 @@
                 DocumentType: fileType
             };
 
-            fetch('/api/StudentInformationApi/UpsertTimeline', {
+            fetch('/StudentInformation/UpsertTimeline', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
@@ -845,7 +845,7 @@
         function handleDeleteTimeline() {
             if (!selectedTimelineID || !confirm('Are you sure you want to delete this timeline entry?')) return;
 
-            fetch(`/api/StudentInformationApi/DeleteTimeline/${selectedTimelineID}`, { method: 'POST' })
+            fetch(`/StudentInformation/DeleteTimeline/${selectedTimelineID}`, { method: 'POST' })
                 .then(r => r.json())
                 .then(res => {
                     if (res.success) {
@@ -859,7 +859,7 @@
 
         function openDisableModal() {
             // Fetch reasons if not loaded or just load every time for freshness
-            fetch('/api/StudentInformationApi/GetAllDisableReasons')
+            fetch('/StudentInformation/GetAllDisableReasons')
                 .then(r => r.json())
                 .then(res => {
                     if (res.success) {
@@ -892,7 +892,7 @@
                 return;
             }
 
-            fetch('/api/StudentInformationApi/ToggleStatus', {
+            fetch('/StudentInformation/ToggleStatus', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)

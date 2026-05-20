@@ -58,14 +58,14 @@
         }
         @if (canPrint)
         {
-            <button class="btn btn-dark d-inline-flex align-items-center shadow-sm" onclick="triggerExport('print')">
+            <button class="btn btn-secondary d-inline-flex align-items-center shadow-sm" onclick="triggerExport('print')">
                 <i class="ti ti-printer me-1"></i> Print
             </button>
         }
         @if (canExport)
         {
             <div class="dropdown d-inline-block">
-                <button class="btn btn-secondary dropdown-toggle d-inline-flex align-items-center shadow-sm" type="button" data-bs-toggle="dropdown">
+                <button class="btn btn-warning dropdown-toggle d-inline-flex align-items-center shadow-sm" type="button" data-bs-toggle="dropdown">
                     <i class="ti ti-download me-1"></i> Export
                 </button>
                 <ul class="dropdown-menu">
@@ -87,21 +87,21 @@
                     <table class="table table-hover align-items-center mb-0" id="languagesTable">
                         <thead>
                             <tr class="bg-light">
-                                <th class="ps-4" style="width: 50px;">Select</th>
+                                <th style="width: 50px;">Select</th>
                                 <th>Title</th>
                                 <th>Code</th>
                                 <th>Icon</th>
                                 <th>RTL</th>
-                                <th>Base</th>
-                                <th>Status</th>
+                                <th>Base</th>                                
                                 <th>Created On</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var l in Model.Languages)
                             {
                                 <tr class="item-row" onclick="selectItem(@l.LanguageId, this)" style="cursor: pointer;">
-                                    <td class="ps-4 text-center">
+                                    <td class="text-center">
                                         <input type="radio" name="selectedLanguage" class="form-check-input" value="@l.LanguageId">
                                     </td>
                                     <td>
@@ -125,10 +125,11 @@
                                             <span class="badge bg-primary">Base</span>
                                         }
                                     </td>
+                                    <td><span class="">@l.CreatedOn.ToString("dd MMM yyyy")</span></td>
                                     <td>
                                         @if (canEdit)
                                         {
-                                            <div class="form-check form-switch d-flex justify-content-center" onclick="event.stopPropagation()">
+                                            <div class="form-check form-switch" onclick="event.stopPropagation()">
                                                 <input class="form-check-input language-status-switch" type="checkbox" @(l.IsActive ? "checked" : "") onchange="toggleStatus(@l.LanguageId, this.checked)">
                                             </div>
                                         }
@@ -137,7 +138,7 @@
                                             <span class="badge @(l.IsActive ? "bg-success" : "bg-secondary")">@(l.IsActive ? "Active" : "Inactive")</span>
                                         }
                                     </td>
-                                    <td><span class="">@l.CreatedOn.ToString("dd MMM yyyy")</span></td>
+                                    
                                 </tr>
                             }
                         </tbody>

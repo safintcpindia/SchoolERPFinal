@@ -114,7 +114,7 @@
 
         async function loadInitialData() {
             try {
-                const resp = await fetch('/api/ClassApi/GetAll');
+                const resp = await fetch('/StudentInformation/GetClasses');
                 const res = await resp.json();
                 if (res.success) {
                     allClasses = res.data;
@@ -130,7 +130,7 @@
             if (!classId) return;
 
             try {
-                const resp = await fetch(`/api/SectionApi/GetByClass/${classId}`);
+                const resp = await fetch(`/StudentInformation/GetSectionsByClass/${classId}`);
                 const res = await resp.json();
                 if (res.success) {
                     res.data.forEach(s => ddl.append(`<option value="${s.sectionID}">${s.sectionName}</option>`));
@@ -147,7 +147,7 @@
             container.html('<div class="col-12 text-center py-5"><div class="spinner-border text-primary"></div></div>');
 
             try {
-                const url = `/api/StudentInformationApi/GetMultiClassStudents?classId=${classId || ''}&sectionId=${sectionId || ''}&searchTerm=${encodeURIComponent(search || '')}`;
+                const url = `/StudentInformation/GetMultiClassStudents?classId=${classId || ''}&sectionId=${sectionId || ''}&searchTerm=${encodeURIComponent(search || '')}`;
                 const resp = await fetch(url);
                 const res = await resp.json();
 
@@ -267,7 +267,7 @@
             };
 
             try {
-                const resp = await fetch('/api/StudentInformationApi/UpsertMultiClass', {
+                const resp = await fetch('/StudentInformation/UpsertMultiClass', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -293,7 +293,7 @@
             if (!confirm('Are you sure you want to remove this class assignment?')) return;
 
             try {
-                const resp = await fetch(`/api/StudentInformationApi/DeleteMultiClass/${multiClassId}`, { method: 'POST' });
+                const resp = await fetch(`/StudentInformation/DeleteMultiClass/${multiClassId}`, { method: 'POST' });
                 const res = await resp.json();
                 if (res.success) {
                     showToast(res.message, 'success');

@@ -54,5 +54,9 @@ namespace SchoolERP.Net.Services.Clients
         /// Tells the main system to remove a user.
         /// </summary>
         Task<ApiResponse<bool>> DeleteUserAsync(int id);
+
+        Task<ApiResponse<bool>> IsUsernameUniqueAsync(string username, int userId = 0);
+        Task<ApiResponse<UserWizardViewModel>> GetUserWizardDataAsync(int userId = 0, string roleIds = "");
+        Task<ApiResponse<bool>> SaveUserWizardAsync(UserUpsertRequest request);
     }
 }

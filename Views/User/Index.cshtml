@@ -12,6 +12,7 @@
     Layout = "_Layout";
     var canPrint = PermHelper.HasPermissionByUrl("/User", "Print");
     var canExport = PermHelper.HasPermissionByUrl("/User", "Export");
+    
 }
 
 <link rel="stylesheet" href="~/css/treeview.css" />
@@ -834,7 +835,7 @@
             if (!ddl) return;
 
             try {
-                const resp = await fetch('/api/user/wizard-data?userId=0&roleIds=');
+                const resp = await fetch('/User/GetWizardData?userId=0&roleIds=');
                 const result = await resp.json();
                 const companies = result?.data?.allCompanies || [];
 
@@ -924,7 +925,7 @@
             if (selectedUserId > 0) {
                 if (confirm('Are you sure you want to delete this user?')) {
                     try {
-                        const response = await fetch(`/api/user/delete/${selectedUserId}`, {
+                        const response = await fetch(`/User/DeleteUser?id=${selectedUserId}`, {
                             method: 'POST'
                         });
                         const result = await response.json();
@@ -1178,7 +1179,7 @@
 
         async function checkUsernameUnique(username, userId) {
             try {
-                const response = await fetch(`/api/user/check-username?username=${encodeURIComponent(username)}&userId=${userId}`);
+                const response = await fetch(`/User/CheckUsername?username=${encodeURIComponent(username)}&userId=${userId}`);
                 const result = await response.json();
                 return (result.success && result.data === true);
             } catch(e) {
@@ -1289,7 +1290,7 @@
             let queryIds = previewRoleId > 0 ? previewRoleId : roleIds;
 
             try {
-                const response = await fetch(`/api/user/wizard-data?userId=${userId}&roleIds=${queryIds}`);
+                const response = await fetch(`/User/GetWizardData?userId=${userId}&roleIds=${queryIds}`);
                 const result = await response.json();
                 if (result.success) {
                     // wizardData = result.data;
@@ -2091,7 +2092,7 @@
             resetWizardUI();
             wizardData.selectedCompanyIDs = [];
             try {
-                const response = await fetch(`/api/user/${userId}`);
+                const response = await fetch(`/User/GetUser?userId=${userId}`);
                 const result = await response.json();
                 if (result.success) {
                     const u = result.data;
@@ -2107,7 +2108,7 @@
                     // Roles are loaded via wizard-data call later, but let's pre-check for validation
                     // Wait, we need them for step 1 validation immediately if user clicks Next.
                     // Better to fetch role IDs now.
-                    const roleResp = await fetch(`/api/user/${userId}/roles`);
+                    const roleResp = await fetch(`/User/GetUserRoles?userId=${userId}`);
                     const roleData = await roleResp.json();
                     if (roleData.success) {
                         roleData.data.forEach(rid => {
@@ -2227,7 +2228,7 @@
                 
                
             try {
-                const response = await fetch('/api/user/save-wizard', {
+                const response = await fetch('/User/SaveWizard', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(request)
@@ -2259,7 +2260,7 @@
         // ========================================
         async function toggleStatus(userId, isActive) {
             try {
-                const response = await fetch(`/api/user/toggle-status?userId=${userId}&isActive=${isActive}`, {
+                const response = await fetch(`/User/ToggleStatus?userId=${userId}&isActive=${isActive}`, {
                     method: 'POST'
                 });
                 const result = await response.json();
@@ -2281,7 +2282,7 @@
             if (!confirm('Are you sure you want to unlock this user?')) return;
 
             try {
-                const response = await fetch(`/api/user/unlock/${userId}`, {
+                const response = await fetch(`/User/Unlock?userId=${userId}`, {
                     method: 'POST'
                 });
                 const result = await response.json();

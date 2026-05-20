@@ -16,9 +16,12 @@
     var canAdd = PermHelper.HasPermissionByUrl("/Settings", "Add");
     var canEdit = PermHelper.HasPermissionByUrl("/Settings", "Edit");
     var canDelete = PermHelper.HasPermissionByUrl("/Settings", "Delete");
+    var canPrint = PermHelper.HasPermissionByUrl("/Settings", "Print");
+    var canExport = PermHelper.HasPermissionByUrl("/Settings", "Export");
 }
 
 <style>
+    .dt-buttons { display: none !important; }
     :root {
         --tree-line-color: #dee2e6;
         --tree-indent: 2.5rem;
@@ -173,6 +176,26 @@
             <button id="btnDelete" class="btn btn-danger shadow-sm" disabled onclick="deleteSelected()">
                 <i class="ti ti-trash me-1"></i>Delete
             </button>
+        }
+        @if (canPrint)
+        {
+            <button class="btn btn-secondary d-inline-flex align-items-center shadow-sm" onclick="triggerExport('print')">
+                <i class="ti ti-printer me-1"></i>Print
+            </button>
+        }
+        @if (canExport)
+        {
+            <div class="dropdown d-inline-flex">
+                <button class="btn btn-warning dropdown-toggle d-inline-flex align-items-center shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="ti ti-download me-1"></i>Export
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport('copy')"><i class="ti ti-copy me-1"></i>Copy</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport('csv')"><i class="ti ti-file-text me-1"></i>CSV</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport('excel')"><i class="ti ti-file-spreadsheet me-1"></i>Excel</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport('pdf')"><i class="ti ti-file-description me-1"></i>PDF</a></li>
+                </ul>
+            </div>
         }
     </div>
 </div>
@@ -1135,6 +1158,179 @@
             });
         });
 
+        let exportTable;
+        function triggerExport(type) {
+            if (!exportTable) return;
+            if (type === 'copy') exportTable.button('.buttons-copy').trigger();
+            else if (type === 'csv') exportTable.button('.buttons-csv').trigger();
+            else if (type === 'excel') exportTable.button('.buttons-excel').trigger();
+            else if (type === 'pdf') exportTable.button('.buttons-pdf').trigger();
+            else if (type === 'print') exportTable.button('.buttons-print').trigger();
+        }
+
+        $(document).ready(function () {
+            if ($('#companyTable tbody tr.item-row').length > 0) {
+                exportTable = $('#companyTable').DataTable({
+                    dom: 'Bfrtip',
+                    buttons: [
+                        { 
+                            extend: 'copy', 
+                            exportOptions: { 
+                                columns: [1, 2, 3, 4, 5],
+                                rows: ':visible',
+                                format: {
+                                    body: function (data, row, column, node) {
+                                        if (column === 1) {
+                                            const span = node.querySelector('.text-dark');
+                                            if (span) {
+                                                const levelDiv = node.querySelector('div');
+                                                let level = 0;
+                                                if (levelDiv && levelDiv.style.marginLeft) {
+                                                    const ml = parseFloat(levelDiv.style.marginLeft);
+                                                    if (!isNaN(ml)) {
+                                                        level = Math.round(ml / 2.5);
+                                                    }
+                                                }
+                                                const indent = '    '.repeat(level);
+                                                return indent + span.textContent.trim();
+                                            }
+                                        }
+                                        if (column === 4) {
+                                            return node ? node.textContent.replace(/\s+/g, ' ').trim() : data.replace(/\s+/g, ' ').trim();
+                                        }
+                                        return node ? node.textContent.replace(/\s+/g, ' ').trim() : data;
+                                    }
+                                }
+                            } 
+                        },
+                        { 
+                            extend: 'csv', 
+                            exportOptions: { 
+                                columns: [1, 2, 3, 4, 5],
+                                rows: ':visible',
+                                format: {
+                                    body: function (data, row, column, node) {
+                                        if (column === 1) {
+                                            const span = node.querySelector('.text-dark');
+                                            if (span) {
+                                                const levelDiv = node.querySelector('div');
+                                                let level = 0;
+                                                if (levelDiv && levelDiv.style.marginLeft) {
+                                                    const ml = parseFloat(levelDiv.style.marginLeft);
+                                                    if (!isNaN(ml)) {
+                                                        level = Math.round(ml / 2.5);
+                                                    }
+                                                }
+                                                const indent = '    '.repeat(level);
+                                                return indent + span.textContent.trim();
+                                            }
+                                        }
+                                        if (column === 4) {
+                                            return node ? node.textContent.replace(/\s+/g, ' ').trim() : data.replace(/\s+/g, ' ').trim();
+                                        }
+                                        return node ? node.textContent.replace(/\s+/g, ' ').trim() : data;
+                                    }
+                                }
+                            } 
+                        },
+                        { 
+                            extend: 'excel', 
+                            exportOptions: { 
+                                columns: [1, 2, 3, 4, 5],
+                                rows: ':visible',
+                                format: {
+                                    body: function (data, row, column, node) {
+                                        if (column === 1) {
+                                            const span = node.querySelector('.text-dark');
+                                            if (span) {
+                                                const levelDiv = node.querySelector('div');
+                                                let level = 0;
+                                                if (levelDiv && levelDiv.style.marginLeft) {
+                                                    const ml = parseFloat(levelDiv.style.marginLeft);
+                                                    if (!isNaN(ml)) {
+                                                        level = Math.round(ml / 2.5);
+                                                    }
+                                                }
+                                                const indent = '    '.repeat(level);
+                                                return indent + span.textContent.trim();
+                                            }
+                                        }
+                                        if (column === 4) {
+                                            return node ? node.textContent.replace(/\s+/g, ' ').trim() : data.replace(/\s+/g, ' ').trim();
+                                        }
+                                        return node ? node.textContent.replace(/\s+/g, ' ').trim() : data;
+                                    }
+                                }
+                            } 
+                        },
+                        { 
+                            extend: 'pdf', 
+                            exportOptions: { 
+                                columns: [1, 2, 3, 4, 5],
+                                rows: ':visible',
+                                format: {
+                                    body: function (data, row, column, node) {
+                                        if (column === 1) {
+                                            const span = node.querySelector('.text-dark');
+                                            if (span) {
+                                                const levelDiv = node.querySelector('div');
+                                                let level = 0;
+                                                if (levelDiv && levelDiv.style.marginLeft) {
+                                                    const ml = parseFloat(levelDiv.style.marginLeft);
+                                                    if (!isNaN(ml)) {
+                                                        level = Math.round(ml / 2.5);
+                                                    }
+                                                }
+                                                const indent = '    '.repeat(level);
+                                                return indent + span.textContent.trim();
+                                            }
+                                        }
+                                        if (column === 4) {
+                                            return node ? node.textContent.replace(/\s+/g, ' ').trim() : data.replace(/\s+/g, ' ').trim();
+                                        }
+                                        return node ? node.textContent.replace(/\s+/g, ' ').trim() : data;
+                                    }
+                                }
+                            } 
+                        },
+                        { 
+                            extend: 'print', 
+                            exportOptions: { 
+                                columns: [1, 2, 3, 4, 5],
+                                rows: ':visible',
+                                format: {
+                                    body: function (data, row, column, node) {
+                                        if (column === 1) {
+                                            const span = node.querySelector('.text-dark');
+                                            if (span) {
+                                                const levelDiv = node.querySelector('div');
+                                                let level = 0;
+                                                if (levelDiv && levelDiv.style.marginLeft) {
+                                                    const ml = parseFloat(levelDiv.style.marginLeft);
+                                                    if (!isNaN(ml)) {
+                                                        level = Math.round(ml / 2.5);
+                                                    }
+                                                }
+                                                const indent = '    '.repeat(level);
+                                                return indent + span.textContent.trim();
+                                            }
+                                        }
+                                        if (column === 4) {
+                                            return node ? node.textContent.replace(/\s+/g, ' ').trim() : data.replace(/\s+/g, ' ').trim();
+                                        }
+                                        return node ? node.textContent.replace(/\s+/g, ' ').trim() : data;
+                                    }
+                                }
+                            } 
+                        }
+                    ],
+                    searching: false,
+                    paging: false,
+                    info: false,
+                    ordering: false
+                });
+            }
+        });
 </script>
 
 

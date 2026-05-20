@@ -68,5 +68,95 @@ namespace SchoolERP.Net.Controllers
             };
             return View(model);
         }
+
+        #region Room Type API Endpoints
+        [HttpGet]
+        public async Task<IActionResult> GetRoomTypeByID(int id)
+        {
+            var res = await _client.GetRoomTypeByIDAsync(id);
+            return Json(res);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpsertRoomType([FromBody] RoomTypeUpsertRequest req)
+        {
+            var res = await _client.UpsertRoomTypeAsync(req);
+            return Json(res);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteRoomType(int id)
+        {
+            var res = await _client.DeleteRoomTypeAsync(id);
+            return Json(res);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleRoomTypeStatus(int id, bool isActive)
+        {
+            var res = await _client.ToggleRoomTypeStatusAsync(id, isActive);
+            return Json(res);
+        }
+        #endregion
+
+        #region Hostel API Endpoints
+        [HttpGet]
+        public async Task<IActionResult> GetHostelByID(int id)
+        {
+            var res = await _client.GetHostelByIDAsync(id);
+            return Json(res);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpsertHostel([FromBody] HostelUpsertRequest req)
+        {
+            var res = await _client.UpsertHostelAsync(req);
+            return Json(res);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteHostel(int id)
+        {
+            var res = await _client.DeleteHostelAsync(id);
+            return Json(res);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleHostelStatus(int id, bool isActive)
+        {
+            var res = await _client.ToggleHostelStatusAsync(id, isActive);
+            return Json(res);
+        }
+        #endregion
+
+        #region Hostel Room API Endpoints
+        [HttpGet]
+        public async Task<IActionResult> GetHostelRoomByID(int id)
+        {
+            var res = await _client.GetHostelRoomByIDAsync(id);
+            return Json(res);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpsertHostelRoom([FromBody] HostelRoomUpsertRequest req)
+        {
+            var res = await _client.UpsertHostelRoomAsync(req);
+            return Json(res);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteHostelRoom(int id)
+        {
+            var res = await _client.DeleteHostelRoomAsync(id);
+            return Json(res);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleHostelRoomStatus(int id, bool isActive)
+        {
+            var res = await _client.ToggleHostelRoomStatusAsync(id, isActive);
+            return Json(res);
+        }
+        #endregion
     }
 }

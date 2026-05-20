@@ -19,8 +19,9 @@
 }
 
 @section Styles {
-    <link rel="stylesheet" href="https://school.edithtechsoftwares.com/backend/fullcalendar/dist/fullcalendar.min.css">
-    <link rel="stylesheet" href="https://school.edithtechsoftwares.com/backend/fullcalendar/dist/fullcalendar.print.css" media="print">
+    <link rel="stylesheet" href="~/calender/fullcalendar.min.css">
+    <link rel="stylesheet" href="~/calender/fullcalendar.print.css" media="print">
+
 
     <style>
 
@@ -41,6 +42,13 @@
         }
 
         .dt-buttons { display: none !important; }
+
+        .tooltip-inner {
+            max-width: 300px;
+            text-align: left;
+            padding: 10px;
+            font-size: 13px;
+        }
 
     </style>
 }
@@ -276,9 +284,9 @@
 </div>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
-    <script src="https://school.edithtechsoftwares.com/backend/fullcalendar/dist/fullcalendar.min.js"></script>
-    <script src="https://school.edithtechsoftwares.com/backend/fullcalendar/dist/locale-all.js"></script>
+    
+    <script src="~/calender/fullcalendar.min.js"></script>
+    <script src="~/calender/locale-all.js"></script>
     <script>
         let selectedId = 0;
         let calendar;
@@ -324,6 +332,23 @@
                 displayEventTime: true,
                 displayEventEnd: true,
                 timeFormat: 'h:mm a',
+                eventRender: function (event, element) {
+
+                    const tooltipContent = `
+                <div>
+                    <strong>${event.title}</strong><br/>
+                    <b>Time:</b> ${event.fromTime} - ${event.toTime}<br/>
+                    <b>Location:</b> ${event.location || '-'}<br/>
+                    <b>Description:</b> ${event.description || '-'}
+                </div>
+            `;
+
+                    element.attr('data-bs-toggle', 'tooltip');
+                    element.attr('data-bs-html', 'true');
+                    element.attr('title', tooltipContent);
+
+                    new bootstrap.Tooltip(element[0]);
+                },
                 events: function (start, end, timezone, callback) {
                     $.get('/Alumni/GetEvents', function (res) {
                         if (res.success) {
@@ -350,7 +375,13 @@
                                     title: displayTitle,
                                     start: startDateStr,
                                     end: mappedEnd,
-                                    allDay: true
+                                    allDay: true,
+
+                                    // Tooltip Data
+                                    description: item.eventDescription,
+                                    location: item.location,
+                                    fromTime: startTimeStr,
+                                    toTime: endTimeStr
                                 };
                             });
                             callback(events);

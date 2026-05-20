@@ -218,6 +218,7 @@ namespace SchoolERP.Net.Models
         public string? DisableReasonName { get; set; }
         public DateTime? DisableDate { get; set; }
         public string? DisableNote { get; set; }
+        public List<StudentCustomFieldValueViewModel> CustomFieldValues { get; set; } = new();
     }
 
     public class StudentListPageViewModel
@@ -227,6 +228,8 @@ namespace SchoolERP.Net.Models
         public int? SelectedSectionId { get; set; }
         public string? SearchTerm { get; set; }
         public string ViewType { get; set; } = "list";
+        public List<FieldModel> SystemFields { get; set; } = new();
+        public List<FieldModel> CustomFields { get; set; } = new();
     }
 
     public class StudentTimelineViewModel

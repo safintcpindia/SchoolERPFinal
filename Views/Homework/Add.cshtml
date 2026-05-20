@@ -57,7 +57,7 @@
         @if (canExport)
         {
             <div class="dropdown d-inline-flex">
-                <button class="btn btn-info d-inline-flex align-items-center dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <button class="btn btn-warning d-inline-flex align-items-center dropdown-toggle" type="button" data-bs-toggle="dropdown">
                     <i class="ti ti-download me-1"></i>Export
                 </button>
                 <ul class="dropdown-menu">
@@ -428,7 +428,7 @@
             if (!classId || !sectionId) return;
 
             try {
-                const resp = await fetch('/api/SubjectGroupApi/GetAll');
+                const resp = await fetch('/Homework/GetSubjectGroups');
                 const res = await resp.json();
                 if (res.success && res.data) {
                     const filtered = res.data.filter(g => 
@@ -447,12 +447,12 @@
             if (!groupId) return;
 
             try {
-                const resp = await fetch(`/api/SubjectGroupApi/GetByID/${groupId}`);
+                const resp = await fetch(`/Homework/GetSubjectGroupByID?id=${groupId}`);
                 const res = await resp.json();
                 if (res.success && res.data) {
                     // We need subject names, fetching from Subject Group details
                     // The SubjectGroupViewModel should have enough info or we fetch subjects
-                    const subjectsResp = await fetch('/api/SubjectApi/GetAll');
+                    const subjectsResp = await fetch('/Homework/GetSubjects');
                     const subjectsRes = await subjectsResp.json();
                     if (subjectsRes.success) {
                         const filtered = subjectsRes.data.filter(s => res.data.subjectIds.includes(s.subjectID));
@@ -481,7 +481,7 @@
             IV.clearMap(fieldMap);
             IV.clearNotice('modalNotice');
             try {
-                const resp = await fetch(`/api/HomeworkApi/GetByID/${selectedId}`);
+                const resp = await fetch(`/Homework/GetHomeworkByID?id=${selectedId}`);
                 const res = await resp.json();
                 if (res.success) {
                     const h = res.data;
@@ -554,7 +554,7 @@
             $btn.prop('disabled', true).html('<div class="spinner-border spinner-border-sm me-1"></div> Saving...');
 
             try {
-                const resp = await fetch('/api/HomeworkApi/Upsert', {
+                const resp = await fetch('/Homework/UpsertHomework', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -575,7 +575,7 @@
         async function deleteSelected() {
             if (selectedId === 0 || !confirm('Are you sure you want to delete?')) return;
             try {
-                const resp = await fetch(`/api/HomeworkApi/Delete/${selectedId}`, { method: 'POST' });
+                const resp = await fetch(`/Homework/DeleteHomework?id=${selectedId}`, { method: 'POST' });
                 const res = await resp.json();
                 if (res.success) location.reload();
                 else alert(res.message);
@@ -584,7 +584,7 @@
 
         async function toggleStatus(id, isActive) {
             try {
-                const resp = await fetch(`/api/HomeworkApi/ToggleStatus?id=${id}&isActive=${isActive}`, { method: 'POST' });
+                const resp = await fetch(`/Homework/ToggleHomeworkStatus?id=${id}&isActive=${isActive}`, { method: 'POST' });
                 const res = await resp.json();
                 if (!res.success) { alert(res.message); }
                 location.reload();

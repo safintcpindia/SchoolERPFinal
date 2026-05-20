@@ -48,14 +48,14 @@
         }
         @if (canPrint)
         {
-            <button class="btn btn-dark d-inline-flex align-items-center shadow-sm" onclick="triggerExport('print')">
+            <button class="btn btn-secondary d-inline-flex align-items-center shadow-sm" onclick="triggerExport('print')">
                 <i class="ti ti-printer me-1"></i> Print
             </button>
         }
         @if (canExport)
         {
             <div class="dropdown d-inline-block">
-                <button class="btn btn-secondary dropdown-toggle d-inline-flex align-items-center shadow-sm" type="button" data-bs-toggle="dropdown">
+                <button class="btn btn-warning dropdown-toggle d-inline-flex align-items-center shadow-sm" type="button" data-bs-toggle="dropdown">
                     <i class="ti ti-download me-1"></i> Export
                 </button>
                 <ul class="dropdown-menu">
@@ -264,7 +264,7 @@
 
     function editSelected() {
         if (!selectedId) return;
-        fetch(`/api/RoutePickupPointsApi/GetRoutePickupPointByID/${selectedId}`)
+        fetch(`/Transport/GetRoutePickupPointByID/${selectedId}`)
             .then(r => r.json())
             .then(res => {
                 if (!res.success) { showToast(res.message, 'danger'); return; }
@@ -308,7 +308,7 @@
             isActive: document.getElementById('chkActive').checked
         };
 
-        fetch('/api/RoutePickupPointsApi/UpsertRoutePickupPoint', {
+        fetch('/Transport/UpsertRoutePickupPoint', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -326,7 +326,7 @@
     function deleteSelected() {
         if (!selectedId) return;
         if (!confirm('Are you sure you want to remove this pickup point from the route?')) return;
-        fetch(`/api/RoutePickupPointsApi/DeleteRoutePickupPoint/${selectedId}`, { method: 'POST' })
+        fetch(`/Transport/DeleteRoutePickupPoint/${selectedId}`, { method: 'POST' })
             .then(r => r.json())
             .then(res => {
                 showToast(res.message, res.success ? 'success' : 'danger');
@@ -335,7 +335,7 @@
     }
 
     function toggleStatus(id, isActive) {
-        fetch(`/api/RoutePickupPointsApi/ToggleRoutePickupPointStatus?id=${id}&isActive=${isActive}`, { method: 'POST' })
+        fetch(`/Transport/ToggleRoutePickupPointStatus?id=${id}&isActive=${isActive}`, { method: 'POST' })
             .then(r => r.json())
             .then(res => showToast(res.message, res.success ? 'success' : 'danger'));
     }

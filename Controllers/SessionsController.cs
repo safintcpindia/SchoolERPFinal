@@ -103,5 +103,19 @@ namespace SchoolERP.Net.Controllers
             var response = await _sessionClient.SetCurrentSessionAsync(request);
             return Json(new { success = response.Success, message = response.Message });
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll(bool includeDeleted = false)
+        {
+            var response = await _sessionClient.GetAllAsync(includeDeleted);
+            return Json(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUserCurrentSession()
+        {
+            var response = await _sessionClient.GetUserCurrentSessionAsync();
+            return Json(new { success = true, data = response.Data });
+        }
     }
 }

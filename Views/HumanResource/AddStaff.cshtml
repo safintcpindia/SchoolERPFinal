@@ -740,7 +740,7 @@
             }).get().reduce((acc, item) => { if (item.key) acc[item.key] = item.value; return acc; }, {})
         };
 
-        fetch('/api/HumanResourceApi/UpsertStaff', {
+        fetch('/HumanResource/UpsertStaff', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)

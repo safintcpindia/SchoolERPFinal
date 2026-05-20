@@ -15,7 +15,14 @@
     var canAdd = PermHelper.HasPermissionByUrl("/Expense/ExpenseHead", "Add");
     var canEdit = PermHelper.HasPermissionByUrl("/Expense/ExpenseHead", "Edit");
     var canDelete = PermHelper.HasPermissionByUrl("/Expense/ExpenseHead", "Delete");
+    var canPrint = PermHelper.HasPermissionByUrl("/Expense/ExpenseHead", "Print");
+    var canExport = PermHelper.HasPermissionByUrl("/Expense/ExpenseHead", "Export");
 }
+<style>
+    .dt-buttons {
+        display: none !important;
+    }
+</style>
 
 <!-- Page Header -->
 <div class="d-flex align-items-sm-center justify-content-between flex-wrap gap-2 mb-2">
@@ -40,6 +47,26 @@
             <button id="btnDelete" class="btn btn-danger" disabled onclick="deleteSelected()">
                 <i class="ti ti-trash me-1"></i> Delete
             </button>
+        }
+        @if (canPrint)
+        {
+            <button class="btn btn-secondary d-inline-flex align-items-center" onclick="triggerExport(4)">
+                <i class="ti ti-printer me-1"></i>Print
+            </button>
+        }
+        @if (canExport)
+        {
+            <div class="dropdown d-inline-flex">
+                <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="ti ti-download me-1"></i>Export
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(0)"><i class="ti ti-copy me-1"></i>Copy</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(1)"><i class="ti ti-file-text me-1"></i>CSV</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(2)"><i class="ti ti-file-spreadsheet me-1"></i>Excel</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(3)"><i class="ti ti-file-description me-1"></i>PDF</a></li>
+                </ul>
+            </div>
         }
     </div>
 </div>
@@ -153,6 +180,30 @@
     const canDelete = @canDelete.ToString().ToLower();
     const headType = '@Model.HeadType';
 
+        function triggerExport(index) {
+            if ($.fn.DataTable.isDataTable('#tblAccountHead')) {
+                const table = $('#tblAccountHead').DataTable();
+                table.button(index).trigger();
+            }
+        }
+
+        $(document).ready(function () {
+            $('#tblAccountHead').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    { extend: 'copy', exportOptions: { columns: [1, 2] } },
+                    { extend: 'csv', exportOptions: { columns: [1, 2] } },
+                    { extend: 'excel', exportOptions: { columns: [1, 2] } },
+                    { extend: 'pdf', exportOptions: { columns: [1, 2] } },
+                    { extend: 'print', exportOptions: { columns: [1, 2] } }
+                ],
+                searching: false,
+                paging: false,
+                info: false
+            });
+        })
+
+
     function selectItem(id, row) {
         selectedId = id;
         document.querySelectorAll('.item-row').forEach(r => r.classList.remove('bg-light'));
@@ -182,7 +233,7 @@
 
     function editSelected() {
         if (!selectedId) return;
-        fetch(`/api/AccountHeadApi/GetAccountHeadByID/${selectedId}`)
+        fetch(`/Expense/GetAccountHeadByID/${selectedId}`)
             .then(r => r.json())
             .then(res => {
                 if (!res.success) { showToast(res.message, 'danger'); return; }
@@ -208,7 +259,7 @@
             isActive:        document.getElementById('chkActive').checked
         };
 
-        fetch('/api/AccountHeadApi/UpsertAccountHead', {
+        fetch('/Expense/UpsertAccountHead', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -226,7 +277,7 @@
     function deleteSelected() {
         if (!selectedId) return;
         if (!confirm('Are you sure you want to delete this record?')) return;
-        fetch(`/api/AccountHeadApi/DeleteAccountHead/${selectedId}`, { method: 'POST' })
+        fetch(`/Expense/DeleteAccountHead/${selectedId}`, { method: 'POST' })
             .then(r => r.json())
             .then(res => {
                 showToast(res.message, res.success ? 'success' : 'danger');
@@ -235,7 +286,7 @@
     }
 
     function toggleStatus(id, isActive) {
-        fetch(`/api/AccountHeadApi/ToggleAccountHeadStatus?id=${id}&isActive=${isActive}`, { method: 'POST' })
+        fetch(`/Expense/ToggleAccountHeadStatus?id=${id}&isActive=${isActive}`, { method: 'POST' })
             .then(r => r.json())
             .then(res => showToast(res.message, res.success ? 'success' : 'danger'));
     }
