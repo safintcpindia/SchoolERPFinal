@@ -206,6 +206,10 @@ namespace SchoolERP.Net.Controllers.Api
             {
                 data = data.Where(s => s.IsActive == isActive.Value).ToList();
             }
+            else
+            {
+                data = data.ToList();
+            }
             return Ok(new { success = true, data });
         }
 

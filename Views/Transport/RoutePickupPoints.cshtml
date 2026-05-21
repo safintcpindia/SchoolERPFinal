@@ -23,7 +23,7 @@
     .dt-buttons { display: none !important; }
 </style>
 
-<div class="d-flex align-items-sm-center justify-content-between flex-wrap gap-2 mb-2">
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
     <div>
         <h6 class="fw-bold mb-0">Route Pickup Point List</h6>
     </div>
@@ -109,7 +109,7 @@
                                     <td class="ps-3">
                                         <input type="radio" name="selectedItem" class="form-check-input" value="@item.RoutePickupPointID">
                                     </td>
-                                    <td class="fw-bold">@item.RouteName.ToUpper()</td>
+                                    <td>@item.RouteName.ToUpper()</td>
                                     <td>@item.PickupPointName</td>
                                     <td>@(item.Distance?.ToString("N2") ?? "0.00")</td>
                                     <td>@(string.IsNullOrEmpty(item.PickupTime) ? "---" : item.PickupTime)</td>

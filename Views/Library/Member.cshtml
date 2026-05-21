@@ -30,14 +30,14 @@
     <div class="d-flex gap-1">
         <a href="javascript:void(0)" class="btn btn-secondary" onclick="triggerExport(4)"><i class="ti ti-printer me-1"></i> Print</a>
         <div class="dropdown d-inline-flex">
-            <button class="btn btn-info d-inline-flex align-items-center dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <button class="btn btn-warning d-inline-flex align-items-center dropdown-toggle" type="button" data-bs-toggle="dropdown">
                 <i class="ti ti-download me-1"></i>Export
             </button>
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(0)"><i class="ti ti-copy me-1"></i>Copy</a></li>
                 <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(1)"><i class="ti ti-file-text me-1"></i>CSV</a></li>
                 <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(2)"><i class="ti ti-file-spreadsheet me-1"></i>Excel</a></li>
-                <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(3)"><i class="ti ti-file-pdf me-1"></i>PDF</a></li>
+                <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(3)"><i class="ti ti-file-description me-1"></i>PDF</a></li>
             </ul>
         </div>
         @if (canIssue)

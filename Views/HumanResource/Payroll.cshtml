@@ -234,7 +234,7 @@ $(document).ready(function () {
             $('[data-bs-toggle="dropdown"]').dropdown('hide');
 
             $.ajax({
-                url: `/HumanResource/GetAllPayroll?month=${month}&year=${year}&roleId=${roleId || ''}`,
+                url: `/api/HumanResourceApi/GetAllPayroll?month=${month}&year=${year}&roleId=${roleId || ''}`,
                 type: 'GET',
                 success: function (res) {
                     console.log("Payroll API Response:", res);
@@ -351,7 +351,7 @@ $(document).ready(function () {
         function viewPayslip(id) {
             console.log("Fetching payslip for ID:", id);
             $.ajax({
-                url: `/HumanResource/GetPayrollDetails/${id}`,
+                url: `/api/HumanResourceApi/GetPayrollDetails/${id}`,
                 type: 'GET',
                 success: function (res) {
                     console.log("Payslip API Response:", res);
@@ -543,7 +543,7 @@ $(document).ready(function () {
             };
 
             $.ajax({
-                url: '/HumanResource/PayPayroll',
+                url: '/api/HumanResourceApi/PayPayroll',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(data),

@@ -64,7 +64,7 @@
                     <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(0)"><i class="ti ti-copy me-1"></i>Copy</a></li>
                     <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(1)"><i class="ti ti-file-text me-1"></i>CSV</a></li>
                     <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(2)"><i class="ti ti-file-spreadsheet me-1"></i>Excel</a></li>
-                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(3)"><i class="ti ti-file-pdf me-1"></i>PDF</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="triggerExport(3)"><i class="ti ti-file-description me-1"></i>PDF</a></li>
                 </ul>
             </div>
         }
@@ -103,8 +103,8 @@
         <div class="card shadow-tbl">
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0" id="homeworkTable" style="display: none;">
-                        <thead class="bg-light">
+                    <table class="table" id="homeworkTable" style="display: none;">
+                        <thead>
                             <tr>
                                 <th style="width: 50px;">#</th>
                                 <th>Class (Section)</th>
@@ -127,7 +127,7 @@
                                             <input type="radio" name="selectedHomework" class="form-check-input" value="@h.HomeworkID">
                                         </td>
                                         <td>
-                                            <span class="fw-bold">@h.ClassName</span> (@h.SectionName)
+                                            <span>@h.ClassName</span> (@h.SectionName)
                                         </td>
                                         <td>@h.SubjectGroupName</td>
                                         <td>@h.SubjectName</td>
@@ -265,6 +265,10 @@
         .item-row.bg-light-primary { background-color: rgba(13, 110, 253, 0.05); }
         .ck-editor__editable { min-height: 200px; }
         .dt-buttons { display: none !important; }
+
+        #homeworkTable_filter{
+            display:none;
+        }
     </style>
 }
 

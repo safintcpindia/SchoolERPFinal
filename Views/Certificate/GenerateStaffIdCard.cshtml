@@ -168,53 +168,91 @@ $(document).ready(function () {
             });
         };
 
-        window.searchStaffForGen = function () {
-            var deptId = $('#genDeptId').val();
-            var desigId = $('#genDesigId').val();
+      window.searchStaffForGen = function () {
 
-            
-            $.get('/Certificate/GetAllStaff', { isActive: true }, function (resp) {
-                
-                if (resp.success) {
-                    var data = resp.data;
-                    // Filter by Name as requested
-                    if (deptId) data = data.filter(x => (x.departmentName || x.DepartmentName) == deptId);
-                    if (desigId) data = data.filter(x => (x.designationName || x.DesignationName) == desigId);
-                    
-                    var html = '';
-                    if (!data || data.length === 0) {
-                        html = '<tr><td colspan="6" class="text-center py-5 text-muted">No staff found.</td></tr>';
-                    } else {
-                        data.forEach(function(item) {
-                            var sId = item.staffId || item.staffID || item.StaffID;
-                            var sCode = item.staffCode || item.StaffCode || '';
-                            var fName = item.firstName || item.FirstName || '';
-                            var lName = item.lastName || item.LastName || '';
-                            
-                            var dName = item.designationName || item.DesignationName || desigMapping[item.designationId || item.designationID || item.DesignationID] || '';
-                            var deptName = item.departmentName || item.DepartmentName || deptMapping[item.departmentId || item.departmentID || item.DepartmentID] || '';
-                            
-                            var mob = item.mobileNo || item.MobileNo || '';
+    var deptId = $('#genDeptId').val();
+    var desigId = $('#genDesigId').val();
 
-                            html += '<tr>' +
-                                    '<td><input type="checkbox" class="form-check-input gen-staff-check" value="' + sId + '"></td>' +
-                                    '<td>' + sCode + '</td>' +
-                                    '<td>' + fName + ' ' + lName + '</td>' +
-                                    '<td>' + dName + '</td>' +
-                                    '<td>' + deptName + '</td>' +
-                                    '<td>' + mob + '</td>' +
-                                    '</tr>';
-                        });
-                    }
-                    $('#genStaffList').html(html);
-                } else {
-                    $('#genStaffList').html('<tr><td colspan="6" class="text-center py-5 text-danger">Error: ' + (resp.message || 'Unknown error') + '</td></tr>');
-                }
-            }).fail(function(xhr) {
-                console.error("Search failed:", xhr);
-                $('#genStaffList').html('<tr><td colspan="6" class="text-center py-5 text-danger">Failed to fetch staff data. Please check console.</td></tr>');
+    $.get('/Certificate/GetAllStaff', { isActive: true }, function (resp) {
+
+        var table = $('#genStaffTable').DataTable();
+
+        // CLEAR TABLE
+        table.clear();
+
+        if (resp.success) {
+
+            var data = resp.data || [];
+
+            // FILTERS
+            if (deptId) {
+                data = data.filter(x =>
+                    (x.departmentName || x.DepartmentName) == deptId
+                );
+            }
+
+            if (desigId) {
+                data = data.filter(x =>
+                    (x.designationName || x.DesignationName) == desigId
+                );
+            }
+
+            // ADD ROWS
+            data.forEach(function(item) {
+
+                var sId = item.staffId || item.staffID || item.StaffID;
+                var sCode = item.staffCode || item.StaffCode || '';
+                var fName = item.firstName || item.FirstName || '';
+                var lName = item.lastName || item.LastName || '';
+
+                var dName =
+                    item.designationName ||
+                    item.DesignationName ||
+                    desigMapping[
+                        item.designationId ||
+                        item.designationID ||
+                        item.DesignationID
+                    ] || '';
+
+                var deptName =
+                    item.departmentName ||
+                    item.DepartmentName ||
+                    deptMapping[
+                        item.departmentId ||
+                        item.departmentID ||
+                        item.DepartmentID
+                    ] || '';
+
+                var mob = item.mobileNo || item.MobileNo || '';
+
+                table.row.add([
+                    '<input type="checkbox" class="form-check-input gen-staff-check" value="' + sId + '">',
+                    sCode,
+                    fName + ' ' + lName,
+                    dName,
+                    deptName,
+                    mob
+                ]);
             });
-        };
+
+            // REFRESH DATATABLE
+            table.draw();
+
+        } else {
+
+            table.draw();
+            alert(resp.message || 'Error loading staff.');
+
+        }
+
+    }).fail(function(xhr) {
+
+        console.error(xhr);
+        alert('Failed to fetch staff data.');
+
+    });
+
+};
 
         window.toggleAllStaffForGen = function (c) { $('.gen-staff-check').prop('checked', c); };
 

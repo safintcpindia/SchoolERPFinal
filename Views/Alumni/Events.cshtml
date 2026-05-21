@@ -79,14 +79,14 @@
         }
         @if (canPrint)
         {
-            <button class="btn btn-dark d-inline-flex align-items-center shadow-sm" onclick="triggerExport('print')">
+            <button class="btn btn-secondary d-inline-flex align-items-center shadow-sm" onclick="triggerExport('print')">
                 <i class="ti ti-printer me-1"></i> Print
             </button>
         }
         @if (canExport)
         {
             <div class="dropdown d-inline-block">
-                <button class="btn btn-secondary dropdown-toggle d-inline-flex align-items-center shadow-sm" type="button" data-bs-toggle="dropdown">
+                <button class="btn btn-warning dropdown-toggle d-inline-flex align-items-center shadow-sm" type="button" data-bs-toggle="dropdown">
                     <i class="ti ti-download me-1"></i> Export
                 </button>
                 <ul class="dropdown-menu">
@@ -256,23 +256,23 @@
                 <div class="d-flex align-items-center gap-2 mb-3">
                     <img id="viewImage" src="/assets/img/default-event.jpg" class="rounded object-fit-cover" width="80" height="80" alt="Event">
                     <div>
-                        <h6 id="viewTitle" class="mb-1 fw-bold">Demo Event</h6>
+                        <h6 id="viewTitle" class="mb-1">Demo Event</h6>
                         <span id="viewDate" class="text-muted"><i class="ti ti-calendar"></i></span>
                     </div>
                 </div>
                 <hr>
                 <div>
-                    <h6 class="mb-1 fw-bold">Note :</h6>
+                    <h6 class="mb-1">Note :</h6>
                     <p id="viewDescription" class="text-muted mb-0"></p>
                 </div>
                 <hr>
                 <div>
-                    <h6 class="mb-1 fw-bold">Location :</h6>
+                    <h6 class="mb-1">Location :</h6>
                     <p id="viewLocation" class="text-muted mb-0">-</p>
                 </div>
                 <div id="viewAudienceContainer" class="d-none">
                     <hr>
-                    <h6 class="mb-1 fw-bold">Target Audience :</h6>
+                    <h6 class="mb-1">Target Audience :</h6>
                     <p class="text-muted mb-0">
                         <span id="viewAudienceSummary"></span><br/>
                         <small id="viewSections" class="text-primary"></small>
@@ -401,8 +401,10 @@
                     }
                 },
                 eventClick: function(event, jsEvent, view) {
+
                     selectItem(event.id, `#row-${event.id}`);
                     handleViewAction();
+
                 },
                 dayRender: function(date, cell) {
                     if (!selectedId) return;
@@ -522,6 +524,7 @@
         }
 
         function handleViewAction() {
+            $(".tooltip").removeClass("show");
             if (!selectedId) return;
             const data = $(`#row-${selectedId}`).data('item-info');
             

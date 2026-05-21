@@ -107,9 +107,9 @@
             table.button(index).trigger();
         }
     }
-
+        let sicTable;
 $(document).ready(function () {
-            $('#genStudentTable').DataTable({
+         sicTable=   $('#genStudentTable').DataTable({
             dom: 'Bfrtip',
             buttons: [
                 { extend: 'copy', exportOptions: { columns: [1, 2, 3, 4, 5] } },
@@ -171,31 +171,53 @@ $(document).ready(function () {
         };
 
         window.searchStudentsForGen = function () {
+
             var classId = $('#genClassId').val();
             var sectionId = $('#genSectionId').val();
-            if (!classId) { alert('Please select a class.'); return; }
 
-            
-            $.get('/Certificate/GetStudentList', { classId: classId, sectionId: sectionId }, function (resp) {
-                if (resp.success) {
-                    var html = '';
-                    if (resp.data.length === 0) {
-                        html = '';
-                    } else {
-                        resp.data.forEach(function(item) {
-                            html += '<tr>' +
-                                    '<td><input type="checkbox" class="form-check-input gen-student-check" value="' + item.studentID + '"></td>' +
-                                    '<td>' + (item.admissionNo || '') + '</td>' +
-                                    '<td>' + (item.rollNo || '') + '</td>' +
-                                    '<td>' + (item.fullName || '') + '</td>' +
-                                    '<td>' + (item.className || '') + ' (' + (item.sectionName || '') + ')</td>' +
-                                    '<td>' + (item.fatherName || '') + '</td>' +
-                                    '</tr>';
-                        });
+            if (!classId) {
+                alert('Please select a class.');
+                return;
+            }
+
+            $.get('/Certificate/GetStudentList',
+                {
+                    classId: classId,
+                    sectionId: sectionId
+                },
+                function (resp) {
+
+                    if (resp.success) {
+
+                        sicTable.clear();
+
+                        if (resp.data.length > 0) {
+
+                            resp.data.forEach(function (item) {
+
+                                sicTable.row.add([
+
+                                    '<input type="checkbox" class="form-check-input gen-student-check" value="' + item.studentID + '">',
+
+                                    (item.admissionNo || ''),
+
+                                    (item.rollNo || ''),
+
+                                    (item.fullName || ''),
+
+                                    (item.className || '') + ' (' + (item.sectionName || '') + ')',
+
+                                    (item.fatherName || '')
+
+                                ]);
+
+                            });
+
+                        }
+
+                        sicTable.draw();
                     }
-                    $('#genStudentList').html(html);
-                }
-            });
+                });
         };
 
         window.toggleAllStudentsForGen = function (c) { $('.gen-student-check').prop('checked', c); };

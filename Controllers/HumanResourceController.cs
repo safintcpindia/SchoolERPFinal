@@ -329,6 +329,14 @@ namespace SchoolERP.Net.Controllers
             return View(model);
         }
 
+        public IActionResult GetAllPayroll(int month,int year,int rollId)
+        {
+            int companyId = GetCompanyId();
+            int sessionId = GetSessionId();
+            var list = _hrService.GetAllPayroll(companyId, sessionId, month, year, rollId);
+            return Ok(new { success = true, data = list, debug_companyId = companyId, debug_sessionId = sessionId });
+        }
+
 
         public IActionResult DownloadStaffDocument(int id, string type)
         {

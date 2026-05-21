@@ -1,34 +1,26 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\DELL\\Downloads\\SchoolERP 20-5-2026\\",
+  "WorkspaceRootPath": "D:\\School ERP Project\\21-05-2026\\SchoolERPFinal\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|c:\\users\\dell\\downloads\\schoolerp 20-5-2026\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|d:\\school erp project\\21-05-2026\\schoolerpfinal\\views\\downloadcenter\\contentsharelist.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|solutionrelative:views\\downloadcenter\\contentsharelist.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|c:\\users\\dell\\downloads\\schoolerp 20-5-2026\\views\\alumni\\events.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "AbsoluteMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|d:\\school erp project\\21-05-2026\\schoolerpfinal\\views\\alumni\\events.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|solutionrelative:views\\alumni\\events.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|c:\\users\\dell\\downloads\\schoolerp 20-5-2026\\services\\fieldservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|solutionrelative:services\\fieldservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|d:\\school erp project\\21-05-2026\\schoolerpfinal\\views\\certificate\\generatestaffidcard.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|solutionrelative:views\\certificate\\generatestaffidcard.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|c:\\users\\dell\\downloads\\schoolerp 20-5-2026\\views\\attendance\\approveleave.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|solutionrelative:views\\attendance\\approveleave.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|d:\\school erp project\\21-05-2026\\schoolerpfinal\\controllers\\api\\humanresourceapicontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|solutionrelative:controllers\\api\\humanresourceapicontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|c:\\users\\dell\\downloads\\schoolerp 20-5-2026\\views\\frontoffice\\complaint.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|solutionrelative:views\\frontoffice\\complaint.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|c:\\users\\dell\\downloads\\schoolerp 20-5-2026\\views\\frontoffice\\admissioninquiry.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|solutionrelative:views\\frontoffice\\admissioninquiry.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|c:\\users\\dell\\downloads\\schoolerp 20-5-2026\\views\\language\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|solutionrelative:views\\language\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|d:\\school erp project\\21-05-2026\\schoolerpfinal\\controllers\\certificatecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CBD8A2FD-7F24-4059-B2D7-96B19D450AE1}|SchoolERP.Net.csproj|solutionrelative:controllers\\certificatecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -43,89 +35,65 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\DELL\\Downloads\\SchoolERP 20-5-2026\\appsettings.json",
-              "RelativeDocumentMoniker": "appsettings.json",
-              "ToolTip": "C:\\Users\\DELL\\Downloads\\SchoolERP 20-5-2026\\appsettings.json",
-              "RelativeToolTip": "appsettings.json",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABMAAAAEAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-05-20T17:11:31.221Z",
+              "Title": "ContentShareList.cshtml",
+              "DocumentMoniker": "D:\\School ERP Project\\21-05-2026\\SchoolERPFinal\\Views\\DownloadCenter\\ContentShareList.cshtml",
+              "RelativeDocumentMoniker": "Views\\DownloadCenter\\ContentShareList.cshtml",
+              "ToolTip": "D:\\School ERP Project\\21-05-2026\\SchoolERPFinal\\Views\\DownloadCenter\\ContentShareList.cshtml",
+              "RelativeToolTip": "Views\\DownloadCenter\\ContentShareList.cshtml",
+              "ViewState": "AQIAAIwAAAAAAAAAAAAAAJUAAABNAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-05-21T10:53:34.936Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "Events.cshtml",
-              "DocumentMoniker": "C:\\Users\\DELL\\Downloads\\SchoolERP 20-5-2026\\Views\\Alumni\\Events.cshtml",
+              "DocumentMoniker": "D:\\School ERP Project\\21-05-2026\\SchoolERPFinal\\Views\\Alumni\\Events.cshtml",
               "RelativeDocumentMoniker": "Views\\Alumni\\Events.cshtml",
-              "ToolTip": "C:\\Users\\DELL\\Downloads\\SchoolERP 20-5-2026\\Views\\Alumni\\Events.cshtml",
+              "ToolTip": "D:\\School ERP Project\\21-05-2026\\SchoolERPFinal\\Views\\Alumni\\Events.cshtml",
               "RelativeToolTip": "Views\\Alumni\\Events.cshtml",
-              "ViewState": "AQIAABgAAAAAAAAAAAAkwDIAAAAJAAAA",
+              "ViewState": "AQIAAIQAAAAAAAAAAAAqwJkAAAAyAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-05-20T16:57:03.252Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "FieldService.cs",
-              "DocumentMoniker": "C:\\Users\\DELL\\Downloads\\SchoolERP 20-5-2026\\Services\\FieldService.cs",
-              "RelativeDocumentMoniker": "Services\\FieldService.cs",
-              "ToolTip": "C:\\Users\\DELL\\Downloads\\SchoolERP 20-5-2026\\Services\\FieldService.cs",
-              "RelativeToolTip": "Services\\FieldService.cs",
-              "ViewState": "AQIAACUAAAAAAAAAAAArwDIAAAAIAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-20T14:52:01.436Z",
+              "WhenOpened": "2026-05-21T07:10:54.977Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "ApproveLeave.cshtml",
-              "DocumentMoniker": "C:\\Users\\DELL\\Downloads\\SchoolERP 20-5-2026\\Views\\Attendance\\ApproveLeave.cshtml",
-              "RelativeDocumentMoniker": "Views\\Attendance\\ApproveLeave.cshtml",
-              "ToolTip": "C:\\Users\\DELL\\Downloads\\SchoolERP 20-5-2026\\Views\\Attendance\\ApproveLeave.cshtml",
-              "RelativeToolTip": "Views\\Attendance\\ApproveLeave.cshtml",
-              "ViewState": "AQIAAMABAAAAAAAAAAAswNgBAAASAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-05-20T12:41:52.857Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "AdmissionInquiry.cshtml",
-              "DocumentMoniker": "C:\\Users\\DELL\\Downloads\\SchoolERP 20-5-2026\\Views\\FrontOffice\\AdmissionInquiry.cshtml",
-              "RelativeDocumentMoniker": "Views\\FrontOffice\\AdmissionInquiry.cshtml",
-              "ToolTip": "C:\\Users\\DELL\\Downloads\\SchoolERP 20-5-2026\\Views\\FrontOffice\\AdmissionInquiry.cshtml",
-              "RelativeToolTip": "Views\\FrontOffice\\AdmissionInquiry.cshtml",
-              "ViewState": "AQIAAKQBAAAAAAAAAAAAAKwBAAAuAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-05-20T12:36:56.507Z"
+              "Title": "HumanResourceApiController.cs",
+              "DocumentMoniker": "D:\\School ERP Project\\21-05-2026\\SchoolERPFinal\\Controllers\\Api\\HumanResourceApiController.cs",
+              "RelativeDocumentMoniker": "Controllers\\Api\\HumanResourceApiController.cs",
+              "ToolTip": "D:\\School ERP Project\\21-05-2026\\SchoolERPFinal\\Controllers\\Api\\HumanResourceApiController.cs",
+              "RelativeToolTip": "Controllers\\Api\\HumanResourceApiController.cs",
+              "ViewState": "AQIAAMUAAAAAAAAAAAAAAMoAAAAIAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-21T06:41:29.655Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "Complaint.cshtml",
-              "DocumentMoniker": "C:\\Users\\DELL\\Downloads\\SchoolERP 20-5-2026\\Views\\FrontOffice\\Complaint.cshtml",
-              "RelativeDocumentMoniker": "Views\\FrontOffice\\Complaint.cshtml",
-              "ToolTip": "C:\\Users\\DELL\\Downloads\\SchoolERP 20-5-2026\\Views\\FrontOffice\\Complaint.cshtml",
-              "RelativeToolTip": "Views\\FrontOffice\\Complaint.cshtml",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-05-20T12:33:58.557Z"
+              "Title": "CertificateController.cs",
+              "DocumentMoniker": "D:\\School ERP Project\\21-05-2026\\SchoolERPFinal\\Controllers\\CertificateController.cs",
+              "RelativeDocumentMoniker": "Controllers\\CertificateController.cs",
+              "ToolTip": "D:\\School ERP Project\\21-05-2026\\SchoolERPFinal\\Controllers\\CertificateController.cs",
+              "RelativeToolTip": "Controllers\\CertificateController.cs",
+              "ViewState": "AQIAAIEAAAAAAAAAAAAnwIoAAAAIAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-21T06:41:15.079Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "C:\\Users\\DELL\\Downloads\\SchoolERP 20-5-2026\\Views\\Language\\Index.cshtml",
-              "RelativeDocumentMoniker": "Views\\Language\\Index.cshtml",
-              "ToolTip": "C:\\Users\\DELL\\Downloads\\SchoolERP 20-5-2026\\Views\\Language\\Index.cshtml",
-              "RelativeToolTip": "Views\\Language\\Index.cshtml",
-              "ViewState": "AQIAAHsAAAAAAAAAAAAAAH8AAABnAAAA",
+              "DocumentIndex": 2,
+              "Title": "GenerateStaffIdCard.cshtml",
+              "DocumentMoniker": "D:\\School ERP Project\\21-05-2026\\SchoolERPFinal\\Views\\Certificate\\GenerateStaffIdCard.cshtml",
+              "RelativeDocumentMoniker": "Views\\Certificate\\GenerateStaffIdCard.cshtml",
+              "ToolTip": "D:\\School ERP Project\\21-05-2026\\SchoolERPFinal\\Views\\Certificate\\GenerateStaffIdCard.cshtml",
+              "RelativeToolTip": "Views\\Certificate\\GenerateStaffIdCard.cshtml",
+              "ViewState": "AQIAAPAAAAAAAAAAAAAIwP4AAAACAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-05-20T12:31:51.875Z"
+              "WhenOpened": "2026-05-21T06:41:08.926Z"
             }
           ]
         }
